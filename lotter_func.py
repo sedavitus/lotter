@@ -1,6 +1,6 @@
 import os
 import pandas
-import secrets
+import math
 
 
 def check_lotter_results_xlsx() -> None:
@@ -73,3 +73,69 @@ def search_in_dataframe(str_for_find: list,
         # date_of_result = df["DRAW"]
         result = "такая комбинация уже выпадала!!!"
     return result
+
+
+def full_database_statistic(MIN: int, MAX: int, df: pandas.core.frame.DataFrame) -> None:
+	"""
+	Получение статистических данных полного архива тиражей
+	(начиная с первого тиража базы и до самого последнего)
+	"""
+	print('ОБЩАЯ СТАТИСТИКА ПОЛНОЙ БАЗЫ ТИРАЖЕЙ')
+	print('-' * 36)
+	print('- лотерея \"Спортлото', MIN, 'из', MAX, '\b\"')
+	if MIN == 6 and MAX == 49:
+		C_5_48 = int(math.factorial(48) / (math.factorial(5) * math.factorial(48-5)))  # C_5_48
+		C_6_49 = int(math.factorial(49) / (math.factorial(6) * math.factorial(49-6)))  # C_6_49 = 13.983.816
+		print('- число возможных комбинаций 6 номеров из 49 =', C_6_49)
+		print('- число перестановок для 6 номеров =', math.factorial(6))  # 720
+		print('- вероятность выпадения в тираже одного номера =', round((C_5_48 / C_6_49), 5))  # 0.12245
+		print('- вероятность выпадения в тираже пары номеров =', round(((1 / 49) * (5 / 48)), 5))  # 0.00213
+		print('- вероятность выпадения в тираже тройки номеров =', round(((1 / 49) * (5 / 48) * (4 / 47)), 5))  # 0.00018
+		print('- основные характеристики базы тиражей:')
+		# Данные из df.describe() сперва собираем в соответствующие списки:
+		list_pandas_mean = [int((df.describe()['N1']['mean']).round(0)), int((df.describe()['N2']['mean']).round(0)), int((df.describe()['N3']['mean']).round(0)), int((df.describe()['N4']['mean']).round(0)), int((df.describe()['N5']['mean']).round(0)), int((df.describe()['N6']['mean']).round(0))]
+		list_pandas_min = [int(df.describe()['N1']['min']), int(df.describe()['N2']['min']), int(df.describe()['N3']['min']), int(df.describe()['N4']['min']), int(df.describe()['N5']['min']), int(df.describe()['N6']['min'])]
+		list_pandas_25p = [int(df.describe()['N1']['25%']), int(df.describe()['N2']['25%']), int(df.describe()['N3']['25%']), int(df.describe()['N4']['25%']), int(df.describe()['N5']['25%']), int(df.describe()['N6']['25%'])]
+		list_pandas_50p = [int(df.describe()['N1']['50%']), int(df.describe()['N2']['50%']), int(df.describe()['N3']['50%']), int(df.describe()['N4']['50%']), int(df.describe()['N5']['50%']), int(df.describe()['N6']['50%'])]
+		list_pandas_75p = [int(df.describe()['N1']['75%']), int(df.describe()['N2']['75%']), int(df.describe()['N3']['75%']), int(df.describe()['N4']['75%']), int(df.describe()['N5']['75%']), int(df.describe()['N6']['75%'])]
+		list_pandas_max = [int(df.describe()['N1']['max']), int(df.describe()['N2']['max']), int(df.describe()['N3']['max']), int(df.describe()['N4']['max']), int(df.describe()['N5']['max']), int(df.describe()['N6']['max'])]
+		print('\tминимальные номера:', *list_pandas_min, '\b,', search_in_dataframe(list_pandas_min, df))
+		print('\t25% номеров <= чем:', *list_pandas_25p, '\b,', search_in_dataframe(list_pandas_25p, df))
+		print('\t50% номеров <= чем:', *list_pandas_50p, '\b,', search_in_dataframe(list_pandas_50p, df))
+		print('\tмедианное значение:', *list_pandas_mean, '\b,', search_in_dataframe(list_pandas_mean, df))
+		print('\t75% номеров <= чем:', *list_pandas_75p, '\b,', search_in_dataframe(list_pandas_75p, df))
+		print('\tмаксимальные номера:', *list_pandas_max, '\b,', search_in_dataframe(list_pandas_max, df), '\n')
+	return 0
+
+
+def last_drawing_statistic(amount_of_draws: int, df: pandas.core.frame.DataFrame) -> None:
+	print('РЕЗУЛЬТАТЫ ПОСЛЕДНЕГО ТИРАЖА')
+	print('-' * 28)
+	print('- число тиражей в базе', amount_of_draws)
+	print('-', amount_of_draws, '\b-ой тираж состоялся', df['DATE'][amount_of_draws].date(), 'с результатами:', df['N1'][amount_of_draws], df['N2'][amount_of_draws], df['N3'][amount_of_draws], df['N4'][amount_of_draws], df['N5'][amount_of_draws], df['N6'][amount_of_draws])
+	if df['WIN6'][amount_of_draws] > 0:
+		print('- 6 номеров угадали:', df['WIN6'][amount_of_draws], '\b, выигрыш каждого составил', df['BYN6'][amount_of_draws], 'BYN')
+	else:
+		print('- 6 номеров не угадал никто')
+	if df['WIN6'][amount_of_draws] > 0:
+		print('- 5 номеров угадали:', df['WIN5'][amount_of_draws], '\b, выигрыш каждого составил', df['BYN5'][amount_of_draws], 'BYN')
+	else:
+		print('- 5 номеров не угадал никто')
+	if df['WIN4'][amount_of_draws] > 0:
+		print('- 4 номера угадали:', df['WIN4'][amount_of_draws], '\b, выигрыш каждого составил', df['BYN4'][amount_of_draws], 'BYN')
+	else:
+		print('- 4 номера не угадал никто')
+	if df['WIN3'][amount_of_draws] > 0:
+		print('- 3 номера угадали:', df['WIN3'][amount_of_draws], '\b, выигрыш каждого составил', df['BYN3'][amount_of_draws], 'BYN')
+	else:
+		print('- 3 номера не угадал никто')
+	print('- джекпот по состоянию на', df['DATE'][amount_of_draws].date(), 'составляет', df['JACK'][amount_of_draws], 'BYN', '\n')
+	return 0
+
+
+def results_of_x_last_drawing(USER_AMOUNT_DRAWING: int, df: pandas.core.frame.DataFrame) -> None:
+	print('РЕЗУЛЬТАТЫ ПОСЛЕДНИХ', USER_AMOUNT_DRAWING, 'ТИРАЖЕЙ')
+	print('-' * (21 + len(str(USER_AMOUNT_DRAWING)) + 8))
+	print('- тиражи отсортированы по убыванию:')
+	print(df.loc[:, "DATE":"N6"].tail(USER_AMOUNT_DRAWING).sort_values(by="DRAW", ascending=False), '\n')
+	return 0

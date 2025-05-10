@@ -1,0 +1,484 @@
+import configparser
+import datetime  # для расчёта 'текущей даты'
+from time import sleep   # для засыпания перед нештатным exit()
+import pandas as pd
+import numpy as np
+import math
+
+from dateutil.parser import parse  # для расчётов 'сколько дней назад выпадал номер'
+import json
+# import os
+# import secrets
+
+import lotter_func as fn  # основные функции проекта вынесены в lotter_func.py
+
+
+# Чтение параметров из lotter.ini============================================
+config = configparser.ConfigParser()  # создание объекта парсера
+config.read("lotter.ini")
+MIN = int(config["Lottery"]["MIN"])
+MAX = int(config["Lottery"]["MAX"])
+USER_AMOUNT_DRAWING = int(config["Analyze"]["USER_AMOUNT_DRAWING"])
+if MIN != 6 or MAX != 49:
+    print('В файле \'lotter.ini\' установлены некорректные настройки!\nПроверьте параметры MIN и MAX!')
+    sleep(5)
+    exit()
+
+
+# Структуры, которые будут использоваться ===================================
+list_49_of_0 = [ 0 for i in range(49) ]  # список '49 нулей'
+list_1_to_49 = [ i for i in range(1, 50) ]  # список 'номера от 1 до 49'
+dict_49_of_0 = dict.fromkeys(list_1_to_49, 0)  # словарь '49 нулей' формируется из списка
+# Словарь для накапливания статистики последних AMOUNT_OF_DRAWING тиражей:
+drawing_data = {
+    "Draw": {
+        'DrawNum': 0,
+        'DrawDate': '0000-00-00',
+        'DrawResult': [0, 0, 0, 0, 0, 0],
+        'NumsOdd': 0,
+        'NumsEven': 0,
+        'RepeatNums': 0
+    },
+    'Nums': {
+        'No1': {
+            'Num': 1,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No2': {
+            'Num': 2,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No3': {
+            'Num': 3,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No4': {
+            'Num': 4,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No5': {
+            'Num': 5,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No6': {
+            'Num': 6,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No7': {
+            'Num': 7,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No8': {
+            'Num': 8,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No9': {
+            'Num': 9,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No10': {
+            'Num': 10,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No11': {
+            'Num': 11,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No12': {
+            'Num': 12,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No13': {
+            'Num': 13,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No14': {
+            'Num': 14,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No15': {
+            'Num': 15,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No16': {
+            'Num': 16,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No17': {
+            'Num': 17,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No18': {
+            'Num': 18,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No19': {
+            'Num': 19,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No20': {
+            'Num': 20,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No21': {
+            'Num': 21,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No22': {
+            'Num': 22,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No23': {
+            'Num': 23,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No24': {
+            'Num': 24,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No25': {
+            'Num': 25,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No26': {
+            'Num': 26,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No27': {
+            'Num': 27,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No28': {
+            'Num': 28,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No29': {
+            'Num': 29,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No30': {
+            'Num': 30,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No31': {
+            'Num': 31,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No32': {
+            'Num': 32,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No33': {
+            'Num': 33,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No34': {
+            'Num': 34,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No35': {
+            'Num': 35,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No36': {
+            'Num': 36,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No37': {
+            'Num': 37,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No38': {
+            'Num': 38,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No39': {
+            'Num': 39,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No40': {
+            'Num': 40,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No41': {
+            'Num': 41,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No42': {
+            'Num': 42,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No43': {
+            'Num': 43,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No44': {
+            'Num': 44,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No45': {
+            'Num': 45,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No46': {
+            'Num': 46,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No47': {
+            'Num': 47,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No48': {
+            'Num': 48,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            },
+        'No49': {
+            'Num': 49,
+            'Frequency': 0,
+            'LastDraw': 0,
+            'LastDate': '0000-00-00',
+            'DayAgo': 0,
+            'Repeat': 0
+            }
+        },
+    'Advices': {
+        'Hot/Cold': {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0, '6': 0, '7': 0, '8': 0, '9': 0, '10': 0, '11': 0, '12': 0, '13': 0, '14': 0, '15': 0, '16': 0, '17': 0, '18': 0, '19': 0, '20': 0, '21': 0, '22': 0, '23': 0, '24': 0, '25': 0, '26': 0, '27': 0, '28': 0, '29': 0, '30': 0, '31': 0, '32': 0, '33': 0, '34': 0, '35': 0, '36': 0, '37': 0, '38': 0, '39': 0, '40': 0, '41': 0, '42': 0, '43': 0, '44': 0, '45': 0, '46': 0, '47': 0, '48': 0, '49': 0},
+        # 'Ognev': []
+        }
+    }
+
+
+# Проверка наличия доступного архива тиражей ================================
+fn.check_lotter_results_xlsx()
+
+# Получение текущей даты
+now_date = datetime.date.today().isoformat()
+
+print('\nLOTTER', '**************************', MIN, 'из', MAX,  '**************************', now_date, '\n')
+""" print('''При обработке результатов тиражей будут использоваться сокращения:
+    DEC: декады - например, для тиража 5 10 25 27 35 40 параметр DEC=012234
+    DIF: разность между самым маленьким и самым большим номером тиража
+    EVN: количество чётных номеров в состоявшемся или прогнозируемом тираже
+    ODD: количество нечётных номеров в состоявшемся или прогнозируемом тираже
+    RPT: количество повторившихся номеров из предыдущего тиража
+    SUM: сумма всех номеров состоявшегося или прогнозируемого тиража\n''')
+"""
+# Настройки для вывода Pandas в консоль:
+pd.set_option('display.max_rows', None)
+pd.set_option('display.max_columns', None)
+pd.set_option('display.max_colwidth', None)
+
+# Формирование датафрейма:
+excel_data = pd.read_excel('lotter_results.xlsx', sheet_name='results', usecols=[x for x in range(18)])
+columns_new_names = ['DRAW', 'DATE', 'N1', 'N2', 'N3', 'N4', 'N5', 'N6', 'WIN6', 'BYN6', 'WIN5', 'BYN5', 'WIN4', 'BYN4', 'WIN3', 'BYN3', 'JACK', 'FOND']
+excel_data.to_csv('lotter_results.csv', header=columns_new_names, index=False, sep=';', lineterminator=';\n', encoding='utf8')
+df = pd.read_csv('lotter_results.csv', delimiter=';', index_col='DRAW', usecols=columns_new_names)
+
+# Оптимизация датафрейма:
+# - перевод текстовой даты '31.12.2023' в тип datetime '2023-12-31'
+df['DATE'] = pd.to_datetime(df['DATE'], format='%d.%m.%Y')
+# - сортировка номеров тиража по порядку (пока они в том порядке, в котором выпадали)
+df[['N1', 'N2', 'N3', 'N4', 'N5', 'N6']] = df[['N1', 'N2', 'N3', 'N4', 'N5', 'N6']].apply(lambda x: np.sort(x), axis=1, raw=True)
+
+# Сохранение датафрейма:
+df.to_csv('lotter_results.csv', encoding='utf-8')
+amount_of_draws = len(df)
+
+# Общая статистика полной базы тиражей:
+fn.full_database_statistic(MIN, MAX, df)
+# Результаты последнего тиража:
+fn.last_drawing_statistic(amount_of_draws, df)
+# Результаты X последних тиражей:
+fn.results_of_x_last_drawing(USER_AMOUNT_DRAWING, df)
