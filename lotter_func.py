@@ -119,7 +119,7 @@ def last_drawing_statistic(amount_of_draws: int, df: pandas.core.frame.DataFrame
 		print('- 6 номеров угадали:', df['WIN6'][amount_of_draws], '\b, выигрыш каждого составил', df['BYN6'][amount_of_draws], 'BYN')
 	else:
 		print('- 6 номеров не угадал никто')
-	if df['WIN6'][amount_of_draws] > 0:
+	if df['WIN5'][amount_of_draws] > 0:
 		print('- 5 номеров угадали:', df['WIN5'][amount_of_draws], '\b, выигрыш каждого составил', df['BYN5'][amount_of_draws], 'BYN')
 	else:
 		print('- 5 номеров не угадал никто')
