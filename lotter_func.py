@@ -61,18 +61,17 @@ def check_lotter_results_xlsx() -> None:
 	return 0
 
 
-def search_in_dataframe(str_for_find: list,
-                        df: pandas.core.frame.DataFrame) -> str:
-    '''
+def search_in_dataframe(str_for_find: list, df: pandas.core.frame.DataFrame) -> str:
+	"""
 	Поиск по базе данных определённой последовательности номеров
-	'''
-    No1, No2, No3, No4, No5, No6 = str_for_find
-    if len(df[(df["N1"] == No1) & (df["N2"] == No2) & (df["N3"] == No3) & (df["N4"] == No4) & (df["N5"] == No5) & (df["N6"] == No6)]) == 0:
-        result = "ранее не выпадали"
-    else:
+	"""
+	No1, No2, No3, No4, No5, No6 = str_for_find
+	if len(df[(df["N1"] == No1) & (df["N2"] == No2) & (df["N3"] == No3) & (df["N4"] == No4) & (df["N5"] == No5) & (df["N6"] == No6)]) == 0:
+		result = "ранее не выпадали"
+	else:
         # date_of_result = df["DRAW"]
-        result = "такая комбинация уже выпадала!!!"
-    return result
+		result = "такая комбинация уже выпадала!!!"
+	return result
 
 
 def full_database_statistic(MIN: int, MAX: int, df: pandas.core.frame.DataFrame) -> None:
@@ -109,6 +108,9 @@ def full_database_statistic(MIN: int, MAX: int, df: pandas.core.frame.DataFrame)
 
 
 def last_drawing_statistic(amount_of_draws: int, df: pandas.core.frame.DataFrame) -> None:
+	"""
+	Получение отчёта с подробными результатами последнего тиража
+	"""
 	print('РЕЗУЛЬТАТЫ ПОСЛЕДНЕГО ТИРАЖА')
 	print('-' * 28)
 	print('- число тиражей в базе', amount_of_draws)
@@ -134,6 +136,10 @@ def last_drawing_statistic(amount_of_draws: int, df: pandas.core.frame.DataFrame
 
 
 def results_of_x_last_drawing(USER_AMOUNT_DRAWING: int, df: pandas.core.frame.DataFrame) -> None:
+	"""
+	Получение краткой статистики по нескольким последним тиражам,
+	количество тиражей указывается польхователем в lotter.ini
+	"""
 	print('РЕЗУЛЬТАТЫ ПОСЛЕДНИХ', USER_AMOUNT_DRAWING, 'ТИРАЖЕЙ')
 	print('-' * (21 + len(str(USER_AMOUNT_DRAWING)) + 8))
 	print('- тиражи отсортированы по убыванию:')

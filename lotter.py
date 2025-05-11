@@ -13,7 +13,7 @@ import json
 import lotter_func as fn  # основные функции проекта вынесены в lotter_func.py
 
 
-# Чтение параметров из lotter.ini============================================
+# Чтение параметров из lotter.ini ===========================================
 config = configparser.ConfigParser()  # создание объекта парсера
 config.read("lotter.ini")
 MIN = int(config["Lottery"]["MIN"])
