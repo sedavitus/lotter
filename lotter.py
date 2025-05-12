@@ -471,9 +471,9 @@ df = pd.read_csv('lotter_results.csv', delimiter=';', index_col='DRAW', usecols=
 df['DATE'] = pd.to_datetime(df['DATE'], format='%d.%m.%Y')
 # - сортировка номеров тиража по порядку (пока они в том порядке, в котором выпадали)
 df[['N1', 'N2', 'N3', 'N4', 'N5', 'N6']] = df[['N1', 'N2', 'N3', 'N4', 'N5', 'N6']].apply(lambda x: np.sort(x), axis=1, raw=True)
-
 # Сохранение датафрейма:
 df.to_csv('lotter_results.csv', encoding='utf-8')
+
 amount_of_draws = len(df)
 
 # Общая статистика полной базы тиражей:
@@ -482,7 +482,6 @@ fn.full_database_statistic(MIN, MAX, df)
 fn.last_drawing_statistic(amount_of_draws, df)
 # Результаты X последних тиражей:
 fn.results_of_x_last_drawing(USER_AMOUNT_DRAWING, df)
-
 
 
 input('Для завершения нажмите ENTER...')

@@ -89,7 +89,7 @@ def full_database_statistic(MIN: int, MAX: int, df: pandas.core.frame.DataFrame)
 		print('- число перестановок для 6 номеров =', math.factorial(6))  # 720
 		print('- вероятность выпадения в тираже одного номера =', round((C_5_48 / C_6_49), 5))  # 0.12245
 		print('- вероятность выпадения в тираже пары номеров =', round(((1 / 49) * (5 / 48)), 5))  # 0.00213
-		print('- вероятность выпадения в тираже тройки номеров =', round(((1 / 49) * (5 / 48) * (4 / 47)), 5))  # 0.00018
+		print('- вероятность выпадения в тираже тройки номеров =', round(((1 / 49) * (5 / 48) * (4 / 47)), 5), '\n')  # 0.00018
 		print('- основные характеристики базы тиражей:')
 		# Данные из df.describe() сперва собираем в соответствующие списки:
 		list_pandas_mean = [int((df.describe()['N1']['mean']).round(0)), int((df.describe()['N2']['mean']).round(0)), int((df.describe()['N3']['mean']).round(0)), int((df.describe()['N4']['mean']).round(0)), int((df.describe()['N5']['mean']).round(0)), int((df.describe()['N6']['mean']).round(0))]
@@ -104,6 +104,15 @@ def full_database_statistic(MIN: int, MAX: int, df: pandas.core.frame.DataFrame)
 		print('\tмедианное значение:', *list_pandas_mean, '\b,', search_in_dataframe(list_pandas_mean, df))
 		print('\t75% номеров <= чем:', *list_pandas_75p, '\b,', search_in_dataframe(list_pandas_75p, df))
 		print('\tмаксимальные номера:', *list_pandas_max, '\b,', search_in_dataframe(list_pandas_max, df), '\n')
+		print('- статистика выигрышей за всё время проведения лотереи:')
+		print('\t6 номеров угадано', df['WIN6'].sum(axis=0), 'раза, суммы выигрышей:')
+		print(df[df['WIN6'] != 0].loc[:, ['DATE', 'N1', 'N2', 'N3', 'N4', 'N5', 'N6', 'WIN6', 'BYN6']])
+		print('\t5 номеров угадано', df['WIN5'].sum(axis=0), 'раза, суммы последних выигрышей:')
+		print(df[df['WIN5'] != 0].loc[:, ['DATE', 'N1', 'N2', 'N3', 'N4', 'N5', 'N6', 'WIN5', 'BYN5']].tail())
+		print('\t4 номера угадано', df['WIN4'].sum(axis=0), 'раз, суммы последних выигрышей:')
+		print(df[df['WIN4'] != 0].loc[:, ['DATE', 'N1', 'N2', 'N3', 'N4', 'N5', 'N6', 'WIN4', 'BYN4']].tail())
+		print('\t3 номера угадано', df['WIN3'].sum(axis=0), 'раз, суммы последних выигрышей:')
+		print(df[df['WIN3'] != 0].loc[:, ['DATE', 'N1', 'N2', 'N3', 'N4', 'N5', 'N6', 'WIN3', 'BYN3']].tail(), '\n')
 	return 0
 
 
