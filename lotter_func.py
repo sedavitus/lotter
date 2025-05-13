@@ -1,7 +1,7 @@
 import os
 import pandas
 import math
-
+from time import sleep   # для засыпания перед нештатным exit()
 
 def check_lotter_results_xlsx() -> None:
 	"""
@@ -66,11 +66,11 @@ def search_in_dataframe(str_for_find: list, df: pandas.core.frame.DataFrame) -> 
 	Поиск по базе данных определённой последовательности номеров
 	"""
 	No1, No2, No3, No4, No5, No6 = str_for_find
-	if len(df[(df["N1"] == No1) & (df["N2"] == No2) & (df["N3"] == No3) & (df["N4"] == No4) & (df["N5"] == No5) & (df["N6"] == No6)]) == 0:
-		result = "ранее не выпадали"
+	if len(df[(df['N1'] == No1) & (df['N2'] == No2) & (df['N3'] == No3) & (df['N4'] == No4) & (df['N5'] == No5) & (df['N6'] == No6)]) == 0:
+		result = "комбинация не выпадала..."
 	else:
         # date_of_result = df["DRAW"]
-		result = "такая комбинация уже выпадала!!!"
+		result = "комбинация уже выпадала!!!"
 	return result
 
 
@@ -80,7 +80,7 @@ def full_database_statistic(MIN: int, MAX: int, df: pandas.core.frame.DataFrame)
 	(начиная с первого тиража базы и до самого последнего)
 	"""
 	print('ОБЩАЯ СТАТИСТИКА ПОЛНОЙ БАЗЫ ТИРАЖЕЙ')
-	print('-' * 36)
+	print('=' * 36)
 	print('- лотерея \"Спортлото', MIN, 'из', MAX, '\b\"')
 	if MIN == 6 and MAX == 49:
 		C_5_48 = int(math.factorial(48) / (math.factorial(5) * math.factorial(48-5)))  # C_5_48
@@ -90,7 +90,18 @@ def full_database_statistic(MIN: int, MAX: int, df: pandas.core.frame.DataFrame)
 		print('- вероятность выпадения в тираже одного номера =', round((C_5_48 / C_6_49), 5))  # 0.12245
 		print('- вероятность выпадения в тираже пары номеров =', round(((1 / 49) * (5 / 48)), 5))  # 0.00213
 		print('- вероятность выпадения в тираже тройки номеров =', round(((1 / 49) * (5 / 48) * (4 / 47)), 5), '\n')  # 0.00018
-		print('- основные характеристики базы тиражей:')
+
+		print('- статистика выигрышей за всё время проведения лотереи:\n')
+		print('6 номеров угадано', df['WIN6'].sum(axis=0), 'раза, суммы выигрышей:')
+		print(df[df['WIN6'] != 0].loc[:, ['DATE', 'N1', 'N2', 'N3', 'N4', 'N5', 'N6', 'WIN6', 'BYN6']], '\n')
+		print('5 номеров угадано', df['WIN5'].sum(axis=0), 'раза, пять последних выигрышей:')
+		print(df[df['WIN5'] != 0].loc[:, ['DATE', 'N1', 'N2', 'N3', 'N4', 'N5', 'N6', 'WIN5', 'BYN5']].tail(), '\n')
+		print('4 номера угадано', df['WIN4'].sum(axis=0), 'раз, пять последних выигрышей:')
+		print(df[df['WIN4'] != 0].loc[:, ['DATE', 'N1', 'N2', 'N3', 'N4', 'N5', 'N6', 'WIN4', 'BYN4']].tail(), '\n')
+		print('3 номера угадано', df['WIN3'].sum(axis=0), 'раз, пять последних выигрышей:')
+		print(df[df['WIN3'] != 0].loc[:, ['DATE', 'N1', 'N2', 'N3', 'N4', 'N5', 'N6', 'WIN3', 'BYN3']].tail(), '\n')
+
+		print('- основные характеристики базы тиражей:\n')
 		# Данные из df.describe() сперва собираем в соответствующие списки:
 		list_pandas_mean = [int((df.describe()['N1']['mean']).round(0)), int((df.describe()['N2']['mean']).round(0)), int((df.describe()['N3']['mean']).round(0)), int((df.describe()['N4']['mean']).round(0)), int((df.describe()['N5']['mean']).round(0)), int((df.describe()['N6']['mean']).round(0))]
 		list_pandas_min = [int(df.describe()['N1']['min']), int(df.describe()['N2']['min']), int(df.describe()['N3']['min']), int(df.describe()['N4']['min']), int(df.describe()['N5']['min']), int(df.describe()['N6']['min'])]
@@ -98,21 +109,84 @@ def full_database_statistic(MIN: int, MAX: int, df: pandas.core.frame.DataFrame)
 		list_pandas_50p = [int(df.describe()['N1']['50%']), int(df.describe()['N2']['50%']), int(df.describe()['N3']['50%']), int(df.describe()['N4']['50%']), int(df.describe()['N5']['50%']), int(df.describe()['N6']['50%'])]
 		list_pandas_75p = [int(df.describe()['N1']['75%']), int(df.describe()['N2']['75%']), int(df.describe()['N3']['75%']), int(df.describe()['N4']['75%']), int(df.describe()['N5']['75%']), int(df.describe()['N6']['75%'])]
 		list_pandas_max = [int(df.describe()['N1']['max']), int(df.describe()['N2']['max']), int(df.describe()['N3']['max']), int(df.describe()['N4']['max']), int(df.describe()['N5']['max']), int(df.describe()['N6']['max'])]
-		print('\tминимальные номера:', *list_pandas_min, '\b,', search_in_dataframe(list_pandas_min, df))
-		print('\t25% номеров <= чем:', *list_pandas_25p, '\b,', search_in_dataframe(list_pandas_25p, df))
-		print('\t50% номеров <= чем:', *list_pandas_50p, '\b,', search_in_dataframe(list_pandas_50p, df))
-		print('\tмедианное значение:', *list_pandas_mean, '\b,', search_in_dataframe(list_pandas_mean, df))
-		print('\t75% номеров <= чем:', *list_pandas_75p, '\b,', search_in_dataframe(list_pandas_75p, df))
-		print('\tмаксимальные номера:', *list_pandas_max, '\b,', search_in_dataframe(list_pandas_max, df), '\n')
-		print('- статистика выигрышей за всё время проведения лотереи:')
-		print('\t6 номеров угадано', df['WIN6'].sum(axis=0), 'раза, суммы выигрышей:')
-		print(df[df['WIN6'] != 0].loc[:, ['DATE', 'N1', 'N2', 'N3', 'N4', 'N5', 'N6', 'WIN6', 'BYN6']])
-		print('\t5 номеров угадано', df['WIN5'].sum(axis=0), 'раза, суммы последних выигрышей:')
-		print(df[df['WIN5'] != 0].loc[:, ['DATE', 'N1', 'N2', 'N3', 'N4', 'N5', 'N6', 'WIN5', 'BYN5']].tail())
-		print('\t4 номера угадано', df['WIN4'].sum(axis=0), 'раз, суммы последних выигрышей:')
-		print(df[df['WIN4'] != 0].loc[:, ['DATE', 'N1', 'N2', 'N3', 'N4', 'N5', 'N6', 'WIN4', 'BYN4']].tail())
-		print('\t3 номера угадано', df['WIN3'].sum(axis=0), 'раз, суммы последних выигрышей:')
-		print(df[df['WIN3'] != 0].loc[:, ['DATE', 'N1', 'N2', 'N3', 'N4', 'N5', 'N6', 'WIN3', 'BYN3']].tail(), '\n')
+		print('минимальные номера:', *list_pandas_min, '\b,', search_in_dataframe(list_pandas_min, df))
+		print('25% номеров <= чем:', *list_pandas_25p, '\b,', search_in_dataframe(list_pandas_25p, df))
+		print('50% номеров <= чем:', *list_pandas_50p, '\b,', search_in_dataframe(list_pandas_50p, df))
+		print('медианное значение:', *list_pandas_mean, '\b,', search_in_dataframe(list_pandas_mean, df))
+		print('75% номеров <= чем:', *list_pandas_75p, '\b,', search_in_dataframe(list_pandas_75p, df))
+		print('максимальные номера:', *list_pandas_max, '\b,', search_in_dataframe(list_pandas_max, df), '\n')
+	return 0
+
+
+def add_0_to_not_full_dict(not_full_dict: dict) -> dict:
+	"""
+	Это вспомогательная функция.
+	Нужна для функции 'hot_cold_full_database', которая (используя понятие
+	'каналов' - о них см. ниже) подсчитывает 'горячие' и 'холодные' номера
+	всего архива тиражей.
+	Функция 'add_0_to_not_full_dict' заполняет 'неполные' словари (размер
+	которых < 49) нулевыми парами 'ключ: значение', т.е. (0: 0).
+	Дополнение нужно для 'выравнивания' размеров 'словарей частотности
+	номеров' (которые образуют 'каналы') и формирования из них затем нового
+	датафрейма. Примечание: Pandas не формирует новый датафрейм из словарей,
+	если эти словари имеют разные размеры.
+	"""
+	if len(not_full_dict) > 49:
+		print("Размер dict, передаваемого в def add_0_to_not_full_dict превышает 49")
+	if len(not_full_dict) == 49:
+		return not_full_dict
+	if len(not_full_dict) < 49:
+		list_tmp = list(not_full_dict.keys())
+		for i in range(1, 50):
+			if i in list_tmp:
+				continue
+			else:
+				not_full_dict[i] = 0
+	return not_full_dict
+
+
+def hot_cold_full_database(df: pandas.core.frame.DataFrame) -> None:
+	"""
+	Подсчёт 'горячих' и 'холодных' номеров по 6 'каналам' для всех тиражей.
+	Концепция 'канала' проста: в каждом тираже выпавшие номера сортируются
+	по возрастанию. Это попытка существенно уменьшить количество возможных
+	комбинаций. (Номера выпадают, конечно, не по порядку. Однако результат
+	всегда подаётся как упорядоченная последовательность. Будь то 234561,
+	или 345612, или 456123, или 561234... - результат одинаковый - 123456).
+	После - по каждому из 'каналов' считается частота появления каждого из
+	номеров и делаются соответствующие выводы: какие номера чаще других
+	выпадают в том или ином 'канале'.
+	"""
+	print("- распределение 'горячих' / 'холодных' номеров по 'каналам', где:")
+	print("\tN1...N6 - выпавшие номера или названия 'каналов'")
+	print("\tFR1...FR6 - частота выпадения номера в 'канале'\n")
+    # с помощью value_counts() можно подсчитать частоту появления номеров по каждому из каналов
+    # и сформировать новый dataframe_freq_all_chanels с общим результатом по всем каналам
+    # т.к. при формировании датафрейма данные д.быть одного размера (а в каналах есть не все номера),
+    # функция 'add_0_to_not_full_dict()' добавит в словари недостающие keys с нулевыми values
+	dict_freq_chanel_1 = add_0_to_not_full_dict(dict(df['N1'].value_counts()))
+	dict_freq_chanel_2 = add_0_to_not_full_dict(dict(df['N2'].value_counts()))
+	dict_freq_chanel_3 = add_0_to_not_full_dict(dict(df['N3'].value_counts()))
+	dict_freq_chanel_4 = add_0_to_not_full_dict(dict(df['N4'].value_counts()))
+	dict_freq_chanel_5 = add_0_to_not_full_dict(dict(df['N5'].value_counts()))
+	dict_freq_chanel_6 = add_0_to_not_full_dict(dict(df['N6'].value_counts()))
+    # исходные данные для датафрейма - словарь списков. добавить "No": list_from_1_to_49, если понадобится
+	dict_freq_all_chanels = {
+		'N1': list(dict_freq_chanel_1.keys()), 'FRE1': list(dict_freq_chanel_1.values()),
+		'N2': list(dict_freq_chanel_2.keys()), 'FRE2': list(dict_freq_chanel_2.values()),
+		'N3': list(dict_freq_chanel_3.keys()), 'FRE3': list(dict_freq_chanel_3.values()),
+		'N4': list(dict_freq_chanel_4.keys()), 'FRE4': list(dict_freq_chanel_4.values()),
+		'N5': list(dict_freq_chanel_5.keys()), 'FRE5': list(dict_freq_chanel_5.values()),
+		'N6': list(dict_freq_chanel_6.keys()), 'FRE6': list(dict_freq_chanel_6.values())
+		}
+    # создание датафрейма 'df_freq_all_chanels'
+	df_freq_all_chanels = pandas.DataFrame(dict_freq_all_chanels)
+    # запись во временный файл 'loter_results.tmp' чтобы избавиться от ненужного индексного столбца
+    # df_freq_all_chanels.to_csv('loter_results.tmp', header=True, index=False, sep=',', lineterminator=',\n', encoding='utf8')
+    # del(df_freq_all_chanels)
+    # читаем заново в чистый df_freq_all_chanels
+    # df_freq_all_chanels = pd.read_csv("loter_results.tmp", index_col=False, usecols=['N1', 'F1', 'N2', 'F2', 'N3', 'F3', 'N4', 'F4', 'N5', 'F5', 'N6', 'F6'])  # index_col=False менее наглядно
+	print(df_freq_all_chanels.head(43), '\n')  # даже более 13-ти строк выводить нет смысла - появляются повторы в соседних каналах
 	return 0
 
 
@@ -121,7 +195,7 @@ def last_drawing_statistic(amount_of_draws: int, df: pandas.core.frame.DataFrame
 	Получение отчёта с подробными результатами последнего тиража
 	"""
 	print('РЕЗУЛЬТАТЫ ПОСЛЕДНЕГО ТИРАЖА')
-	print('-' * 28)
+	print('=' * 28)
 	print('- число тиражей в базе', amount_of_draws)
 	print('-', amount_of_draws, '\b-ой тираж состоялся', df['DATE'][amount_of_draws].date(), 'с результатами:', df['N1'][amount_of_draws], df['N2'][amount_of_draws], df['N3'][amount_of_draws], df['N4'][amount_of_draws], df['N5'][amount_of_draws], df['N6'][amount_of_draws])
 	if df['WIN6'][amount_of_draws] > 0:
@@ -147,10 +221,49 @@ def last_drawing_statistic(amount_of_draws: int, df: pandas.core.frame.DataFrame
 def results_of_x_last_drawing(USER_AMOUNT_DRAWING: int, df: pandas.core.frame.DataFrame) -> None:
 	"""
 	Получение краткой статистики по нескольким последним тиражам,
-	количество тиражей указывается польхователем в lotter.ini
+	количество тиражей указывается пользователем в lotter.ini
 	"""
 	print('РЕЗУЛЬТАТЫ ПОСЛЕДНИХ', USER_AMOUNT_DRAWING, 'ТИРАЖЕЙ')
-	print('-' * (21 + len(str(USER_AMOUNT_DRAWING)) + 8))
+	print('=' * (21 + len(str(USER_AMOUNT_DRAWING)) + 8))
 	print('- тиражи отсортированы по убыванию:')
-	print(df.loc[:, "DATE":"N6"].tail(USER_AMOUNT_DRAWING).sort_values(by="DRAW", ascending=False), '\n')
+	print(df.loc[:, 'DATE':'N6'].tail(USER_AMOUNT_DRAWING).sort_values(by='DRAW', ascending=False), '\n')
+	return 0
+
+
+def add_columns_database(df: pandas.core.frame.DataFrame) -> None:
+	"""
+    Добавление в датафрейм дополнительных столбцов
+    """
+	print('РАСЧЁТ И ДОБАВЛЕНИЕ ДОПОЛНИТЕЛЬНЫХ СТОЛБЦОВ')
+	print('=' * 44)
+	print("""- в названиях столбцов используются сокращения:
+    DEC: 'декады' - например, DEC=012234 для 5,10,25,27,35,40
+    DIF: разность между самым маленьким и самым большим номером;
+    EVN: количество чётных номеров в тираже;
+    ODD: количество нечётных номеров в тираже;
+    RPT: количество повторившихся номеров из предыдущего тиража;
+    SUM: сумма всех номеров в тираже\n""")
+	# DEC - распределение выпавших номеров по десяткам
+	df['DEC'] = (df['N1'] // 10).astype(str) + (df['N2'] // 10).astype(str) + (df['N3'] // 10).astype(str) + (df['N4'] // 10).astype(str) + (df['N5'] // 10).astype(str) + (df['N6'] // 10).astype(str)
+    # ODD - количество нечётных номеров
+	df['ODD'] = df['N1'] % 2 + df['N2'] % 2 + df['N3'] % 2 + df['N4'] % 2 + df['N5'] % 2 + df['N6'] % 2
+    # EVN - количество чётных номеров: просто как число всех номеров минус количество чётных
+	df['EVN'] = 6 - df['ODD']
+    # RPT - количество повторившихся номеров из прошлого тиража
+	repeat_nums_list = []  # список, в который соберём количество повторов
+	numbers_in_past_draw = [0, 0, 0, 0, 0, 0]  # список для хранения результата прошлого тиража
+	for i in range(0, len(df)):
+		numbers_in_this_draw = [int(df.iloc[i, 1]), int(df.iloc[i, 2]), int(df.iloc[i, 3]), int(df.iloc[i, 4]), int(df.iloc[i, 5]), int(df.iloc[i, 6])]
+		# количество совпадений = длине пересечения двух множеств-результатов прошлого и нынешнего тиражей:
+		repeat_nums = len((set(numbers_in_past_draw)).intersection(set(numbers_in_this_draw)))
+		# накопление количества совпадений в списке:
+		repeat_nums_list.append(repeat_nums)
+		numbers_in_past_draw = numbers_in_this_draw
+		i += 1
+    # полученный список разворачивается в дополнительный столбец датафрейма
+	df['RPT'] = repeat_nums_list
+    # DIF - разница между номерами: самым большим (N6) и самым маленьким (N1)
+	df['DIF'] = df['N6'] - df['N1']
+    # SUM - сумма номеров
+	df['SUM'] = df['N1'] + df['N2'] + df['N3'] + df['N4'] + df['N5'] + df['N6']
 	return 0

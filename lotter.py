@@ -13,7 +13,7 @@ import json
 import lotter_func as fn  # основные функции проекта вынесены в lotter_func.py
 
 
-# Чтение параметров из lotter.ini ===========================================
+# Чтение параметров из lotter.ini
 config = configparser.ConfigParser()  # создание объекта парсера
 config.read("lotter.ini")
 MIN = int(config["Lottery"]["MIN"])
@@ -25,7 +25,7 @@ if MIN != 6 or MAX != 49:
     exit()
 
 
-# Структуры, которые будут использоваться ===================================
+# Структуры, которые будут использоваться
 list_49_of_0 = [ 0 for i in range(49) ]  # список '49 нулей'
 list_1_to_49 = [ i for i in range(1, 50) ]  # список 'номера от 1 до 49'
 dict_49_of_0 = dict.fromkeys(list_1_to_49, 0)  # словарь '49 нулей' формируется из списка
@@ -440,20 +440,13 @@ drawing_data = {
     }
 
 
-# Проверка наличия доступного архива тиражей ================================
+# Проверка наличия доступного архива тиражей
 fn.check_lotter_results_xlsx()
 
 # Получение текущей даты
 now_date = datetime.date.today().isoformat()
 
 print('\nLOTTER', '*' * 25, MIN, 'из', MAX,  '*' * 25, now_date, '\n')
-print('''При обработке результатов тиражей будут использоваться сокращения:
-    DEC: декады - например, для тиража 5 10 25 27 35 40 параметр DEC=012234
-    DIF: разность между самым маленьким и самым большим номером тиража
-    EVN: количество чётных номеров в состоявшемся или прогнозируемом тираже
-    ODD: количество нечётных номеров в состоявшемся или прогнозируемом тираже
-    RPT: количество повторившихся номеров из предыдущего тиража
-    SUM: сумма всех номеров состоявшегося или прогнозируемого тиража\n''')
 
 # Настройки для вывода Pandas в консоль:
 pd.set_option('display.max_rows', None)
@@ -472,16 +465,31 @@ df['DATE'] = pd.to_datetime(df['DATE'], format='%d.%m.%Y')
 # - сортировка номеров тиража по порядку (пока они в том порядке, в котором выпадали)
 df[['N1', 'N2', 'N3', 'N4', 'N5', 'N6']] = df[['N1', 'N2', 'N3', 'N4', 'N5', 'N6']].apply(lambda x: np.sort(x), axis=1, raw=True)
 # Сохранение датафрейма:
-df.to_csv('lotter_results.csv', encoding='utf-8')
+df.to_csv('lotter_results.csv', encoding='utf-8')  # delimiter=';'
 
 amount_of_draws = len(df)
 
 # Общая статистика полной базы тиражей:
 fn.full_database_statistic(MIN, MAX, df)
+# Распределение 'горячих' и 'холодных' номеров по каналам
+fn.hot_cold_full_database(df)
+
 # Результаты последнего тиража:
 fn.last_drawing_statistic(amount_of_draws, df)
+
 # Результаты X последних тиражей:
 fn.results_of_x_last_drawing(USER_AMOUNT_DRAWING, df)
+
+# Упрощение датафрейма (ненужные для расчётов столбцы исключаются):
+# df = pd.read_csv('lotter_results.csv', index_col='DRAW', usecols=['DRAW', 'DATE', 'N1', 'N2', 'N3', 'N4', 'N5', 'N6'])
+# df.to_csv('lotter_results.tmp', encoding='utf-8')
+
+# В датафрейм после расчёта добавляются дополнительные столбцы:
+fn.add_columns_database(df)
+
+print(df.tail(10), '\n')
+
+
 
 
 input('Для завершения нажмите ENTER...')
