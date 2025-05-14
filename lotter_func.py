@@ -1,5 +1,6 @@
 import os
 import pandas
+import matplotlib.pyplot as plt
 import math
 from time import sleep   # для засыпания перед нештатным exit()
 
@@ -67,10 +68,10 @@ def search_in_dataframe(str_for_find: list, df: pandas.core.frame.DataFrame) -> 
 	"""
 	No1, No2, No3, No4, No5, No6 = str_for_find
 	if len(df[(df['N1'] == No1) & (df['N2'] == No2) & (df['N3'] == No3) & (df['N4'] == No4) & (df['N5'] == No5) & (df['N6'] == No6)]) == 0:
-		result = "комбинация не выпадала..."
+		result = 'комбинация не выпадала...'
 	else:
-        # date_of_result = df["DRAW"]
-		result = "комбинация уже выпадала!!!"
+        # date_of_result = df['DRAW']
+		result = 'комбинация уже выпадала!!!'
 	return result
 
 
@@ -132,7 +133,7 @@ def add_0_to_not_full_dict(not_full_dict: dict) -> dict:
 	если эти словари имеют разные размеры.
 	"""
 	if len(not_full_dict) > 49:
-		print("Размер dict, передаваемого в def add_0_to_not_full_dict превышает 49")
+		print('Размер dict, передаваемого в def add_0_to_not_full_dict превышает 49')
 	if len(not_full_dict) == 49:
 		return not_full_dict
 	if len(not_full_dict) < 49:
@@ -160,33 +161,52 @@ def hot_cold_full_database(df: pandas.core.frame.DataFrame) -> None:
 	print("- распределение 'горячих' / 'холодных' номеров по 'каналам', где:")
 	print("\tN1...N6 - выпавшие номера или названия 'каналов'")
 	print("\tFR1...FR6 - частота выпадения номера в 'канале'\n")
-    # с помощью value_counts() можно подсчитать частоту появления номеров по каждому из каналов
-    # и сформировать новый dataframe_freq_all_chanels с общим результатом по всем каналам
-    # т.к. при формировании датафрейма данные д.быть одного размера (а в каналах есть не все номера),
-    # функция 'add_0_to_not_full_dict()' добавит в словари недостающие keys с нулевыми values
+	# с помощью value_counts() можно подсчитать частоту появления номеров по каждому из каналов
+	# и сформировать новый dataframe_freq_all_chanels с общим результатом по всем каналам
+	# т.к. при формировании датафрейма данные д.быть одного размера (а в каналах есть не все номера),
+	# функция 'add_0_to_not_full_dict()' добавит в словари недостающие keys с нулевыми values
 	dict_freq_chanel_1 = add_0_to_not_full_dict(dict(df['N1'].value_counts()))
 	dict_freq_chanel_2 = add_0_to_not_full_dict(dict(df['N2'].value_counts()))
 	dict_freq_chanel_3 = add_0_to_not_full_dict(dict(df['N3'].value_counts()))
 	dict_freq_chanel_4 = add_0_to_not_full_dict(dict(df['N4'].value_counts()))
 	dict_freq_chanel_5 = add_0_to_not_full_dict(dict(df['N5'].value_counts()))
 	dict_freq_chanel_6 = add_0_to_not_full_dict(dict(df['N6'].value_counts()))
-    # исходные данные для датафрейма - словарь списков. добавить "No": list_from_1_to_49, если понадобится
+	# исходные данные для датафрейма - словарь списков. добавить "No": list_from_1_to_49, если понадобится
 	dict_freq_all_chanels = {
-		'N1': list(dict_freq_chanel_1.keys()), 'FRE1': list(dict_freq_chanel_1.values()),
-		'N2': list(dict_freq_chanel_2.keys()), 'FRE2': list(dict_freq_chanel_2.values()),
-		'N3': list(dict_freq_chanel_3.keys()), 'FRE3': list(dict_freq_chanel_3.values()),
-		'N4': list(dict_freq_chanel_4.keys()), 'FRE4': list(dict_freq_chanel_4.values()),
-		'N5': list(dict_freq_chanel_5.keys()), 'FRE5': list(dict_freq_chanel_5.values()),
-		'N6': list(dict_freq_chanel_6.keys()), 'FRE6': list(dict_freq_chanel_6.values())
+		'N1': list(dict_freq_chanel_1.keys()), 'FR1': list(dict_freq_chanel_1.values()),
+		'N2': list(dict_freq_chanel_2.keys()), 'FR2': list(dict_freq_chanel_2.values()),
+		'N3': list(dict_freq_chanel_3.keys()), 'FR3': list(dict_freq_chanel_3.values()),
+		'N4': list(dict_freq_chanel_4.keys()), 'FR4': list(dict_freq_chanel_4.values()),
+		'N5': list(dict_freq_chanel_5.keys()), 'FR5': list(dict_freq_chanel_5.values()),
+		'N6': list(dict_freq_chanel_6.keys()), 'FR6': list(dict_freq_chanel_6.values())
 		}
-    # создание датафрейма 'df_freq_all_chanels'
+	# создание датафрейма 'df_freq_all_chanels'
 	df_freq_all_chanels = pandas.DataFrame(dict_freq_all_chanels)
-    # запись во временный файл 'loter_results.tmp' чтобы избавиться от ненужного индексного столбца
-    # df_freq_all_chanels.to_csv('loter_results.tmp', header=True, index=False, sep=',', lineterminator=',\n', encoding='utf8')
-    # del(df_freq_all_chanels)
-    # читаем заново в чистый df_freq_all_chanels
-    # df_freq_all_chanels = pd.read_csv("loter_results.tmp", index_col=False, usecols=['N1', 'F1', 'N2', 'F2', 'N3', 'F3', 'N4', 'F4', 'N5', 'F5', 'N6', 'F6'])  # index_col=False менее наглядно
+	# запись во временный файл 'loter_results.tmp' чтобы избавиться от ненужного индексного столбца
+	df_freq_all_chanels.to_csv('lotter_results.tmp', header=True, index=False, lineterminator=',\n', encoding='utf8')  # sep=';', 
 	print(df_freq_all_chanels.head(43), '\n')  # даже более 13-ти строк выводить нет смысла - появляются повторы в соседних каналах
+	return 0
+
+
+def graph_channels_full_database(df: pandas.core.frame.DataFrame):
+	"""
+	Построение графика 'Распределение номеров по каналам'
+	"""
+	fig, ax = plt.subplots()
+	df.groupby('N1')['FR1'].mean().plot(label=r'$канал\ N1$')
+	df.groupby('N2')['FR2'].mean().plot(label=r'$канал\ N2$')
+	df.groupby('N3')['FR3'].mean().plot(label=r'$канал\ N3$')
+	df.groupby('N4')['FR4'].mean().plot(label=r'$канал\ N4$')
+	df.groupby('N5')['FR5'].mean().plot(label=r'$канал\ N5$')
+	df.groupby('N6')['FR6'].mean().plot(label=r'$канал\ N6$')
+	plt.xlabel(r'$номера$')
+	plt.xticks(rotation=0)
+	plt.ylabel(r'$частота$')
+	plt.title(r'распределение номеров по каналам N1, N2, N3, N4, N5, N6')
+	plt.grid(True)
+	plt.legend(loc='best', fontsize=10)
+	fig.savefig("lotter_graph_6_channels.png", transparent=False, dpi=600)
+	plt.show()
 	return 0
 
 
@@ -230,26 +250,19 @@ def results_of_x_last_drawing(USER_AMOUNT_DRAWING: int, df: pandas.core.frame.Da
 	return 0
 
 
-def add_columns_database(df: pandas.core.frame.DataFrame) -> None:
+def add_columns_to_database(df: pandas.core.frame.DataFrame) -> None:
 	"""
-    Добавление в датафрейм дополнительных столбцов
-    """
-	print('РАСЧЁТ И ДОБАВЛЕНИЕ ДОПОЛНИТЕЛЬНЫХ СТОЛБЦОВ')
-	print('=' * 44)
-	print("""- в названиях столбцов используются сокращения:
-    DEC: 'декады' - например, DEC=012234 для 5,10,25,27,35,40
-    DIF: разность между самым маленьким и самым большим номером;
-    EVN: количество чётных номеров в тираже;
-    ODD: количество нечётных номеров в тираже;
-    RPT: количество повторившихся номеров из предыдущего тиража;
-    SUM: сумма всех номеров в тираже\n""")
+	Добавление в датафрейм дополнительных столбцов
+	"""
+	# print('РАСЧЁТ И ДОБАВЛЕНИЕ ДОПОЛНИТЕЛЬНЫХ СТОЛБЦОВ')
+	# print('=' * 44)
 	# DEC - распределение выпавших номеров по десяткам
 	df['DEC'] = (df['N1'] // 10).astype(str) + (df['N2'] // 10).astype(str) + (df['N3'] // 10).astype(str) + (df['N4'] // 10).astype(str) + (df['N5'] // 10).astype(str) + (df['N6'] // 10).astype(str)
-    # ODD - количество нечётных номеров
+	# ODD - количество нечётных номеров
 	df['ODD'] = df['N1'] % 2 + df['N2'] % 2 + df['N3'] % 2 + df['N4'] % 2 + df['N5'] % 2 + df['N6'] % 2
-    # EVN - количество чётных номеров: просто как число всех номеров минус количество чётных
+	# EVN - количество чётных номеров: просто как число всех номеров минус количество чётных
 	df['EVN'] = 6 - df['ODD']
-    # RPT - количество повторившихся номеров из прошлого тиража
+	# RPT - количество повторившихся номеров из прошлого тиража
 	repeat_nums_list = []  # список, в который соберём количество повторов
 	numbers_in_past_draw = [0, 0, 0, 0, 0, 0]  # список для хранения результата прошлого тиража
 	for i in range(0, len(df)):
@@ -260,10 +273,163 @@ def add_columns_database(df: pandas.core.frame.DataFrame) -> None:
 		repeat_nums_list.append(repeat_nums)
 		numbers_in_past_draw = numbers_in_this_draw
 		i += 1
-    # полученный список разворачивается в дополнительный столбец датафрейма
+	# полученный список разворачивается в дополнительный столбец датафрейма
 	df['RPT'] = repeat_nums_list
-    # DIF - разница между номерами: самым большим (N6) и самым маленьким (N1)
+	# DIF - разница между номерами: самым большим (N6) и самым маленьким (N1)
 	df['DIF'] = df['N6'] - df['N1']
-    # SUM - сумма номеров
+	# SUM - сумма номеров
 	df['SUM'] = df['N1'] + df['N2'] + df['N3'] + df['N4'] + df['N5'] + df['N6']
 	return 0
+
+
+def anomal_results_drawing(ANOMAL_DRAWING: int, df: pandas.core.frame.DataFrame) -> None:
+	print('САМЫЕ НЕОБЫЧНЫЕ РЕЗУЛЬТАТЫ ТИРАЖЕЙ')
+	print('=' * 35)
+	print('Есть ли в архиве тиражи, в которых выпало по 4, 5, 6 номеров одного десятка?\nЕсть ли тиражи, состоящие только из нечётных или только чётных номеров?\n')
+	# четыре номера из первого десятка
+	df_temp = df[(df['N1'] <= 9) & (df['N2'] <= 9) & (df['N3'] <= 9) & (df['N4'] <= 9)]
+	len_df_temp = len(df_temp)
+	if len_df_temp:
+		print('- тиражи, в которых выпали четыре номера из первого десятка, (всего', len_df_temp, 'шт):')
+		print(df_temp.tail(ANOMAL_DRAWING), '\n')
+	# четыре номера из второго десятка
+	df_temp = df[
+		((df['N1'] >= 10) & (df['N1'] <= 19) & (df['N2'] <= 19) & (df['N3'] <= 19) & (df['N4'] <= 19)) |
+		((df['N2'] >= 10) & (df['N2'] <= 19) & (df['N3'] <= 19) & (df['N4'] <= 19) & (df['N5'] <= 19)) |
+		((df['N3'] >= 10) & (df['N3'] <= 19) & (df['N4'] <= 19) & (df['N5'] <= 19) & (df['N6'] <= 19))
+		]
+	len_df_temp = len(df_temp)
+	if len_df_temp:
+		print('- тиражи, в которых выпали четыре номера из второго десятка, (всего', len_df_temp, 'шт):')
+		print(df_temp.tail(ANOMAL_DRAWING), '\n')
+	# четыре номера из третьего десятка
+	df_temp = df[
+		(df['N1'] >= 20) & (df['N1'] <= 29) & (df['N2'] <= 29) & (df['N3'] <= 29) & (df['N4'] <= 29) |
+		(df['N2'] >= 20) & (df['N2'] <= 29) & (df['N3'] <= 29) & (df['N4'] <= 29) & (df['N5'] <= 29) |
+		(df['N3'] >= 20) & (df['N3'] <= 29) & (df['N4'] <= 29) & (df['N5'] <= 29) & (df['N6'] <= 29)
+		]
+	len_df_temp = len(df_temp)
+	if len_df_temp:
+		print('- тиражи, в которых выпали четыре номера из третьего десятка, (всего', len_df_temp, 'шт):')
+		print(df_temp.tail(ANOMAL_DRAWING), '\n')
+	# четыре номера из четвёртого десятка
+	df_temp = df[
+		(df['N1'] >= 30) & (df['N1'] <= 39) & (df['N2'] <= 39) & (df['N3'] <= 39) & (df['N4'] <= 39) |
+		(df['N2'] >= 30) & (df['N2'] <= 39) & (df['N3'] <= 39) & (df['N4'] <= 39) & (df['N5'] <= 39) |
+		(df['N3'] >= 30) & (df['N3'] <= 39) & (df['N4'] <= 39) & (df['N5'] <= 39) & (df['N6'] <= 39)
+		]
+	len_df_temp = len(df_temp)
+	if len_df_temp:
+		print('- тиражи, в которых выпали четыре номера из четвёртого десятка, (всего', len_df_temp, 'шт):')
+		print(df_temp.tail(ANOMAL_DRAWING), '\n')
+	# четыре номера из пятого десятка
+	df_temp = df[(df['N3'] >= 40) & (df['N3'] <= 49) & (df['N4'] <= 49) & (df['N5'] <= 49) & (df['N6'] <= 49)]
+	len_df_temp = len(df_temp)
+	if len_df_temp:
+		print('- тиражи, в которых выпали четыре номера из пятого десятка, (всего', len_df_temp, 'шт):')
+		print(df_temp.tail(ANOMAL_DRAWING), '\n')
+	# пять номеров из первого десятка
+	df_temp = df[(df['N1'] <= 9) & (df['N2'] <= 9) & (df['N3'] <= 9) & (df['N4'] <= 9) & (df['N5'] <= 9)]
+	len_df_temp = len(df_temp)
+	if len_df_temp:
+		print('- тиражи, в которых выпали пять номеров из первого десятка, (всего', len_df_temp, 'шт):')
+		print(df_temp.tail(ANOMAL_DRAWING), '\n')
+	# пять номеров из второго десятка
+	df_temp = df[
+		(df['N1'] >= 10) & (df['N1'] <= 19) & (df['N2'] <= 19) & (df['N3'] <= 19) & (df['N4'] <= 19) & (df['N5'] <= 19) |
+		(df['N2'] >= 10) & (df['N2'] <= 19) & (df['N3'] <= 19) & (df['N4'] <= 19) & (df['N5'] <= 19) & (df['N6'] <= 19)
+		]
+	len_df_temp = len(df_temp)
+	if len_df_temp:
+		print('- тиражи, в которых выпали пять номеров из второго десятка, (всего', len_df_temp, 'шт):')
+		print(df_temp.tail(ANOMAL_DRAWING), '\n')
+	# пять номеров из третьего десятка
+	df_temp = df[
+		(df['N1'] >= 20) & (df['N1'] <= 29) & (df['N2'] <= 29) & (df['N3'] <= 29) & (df['N4'] <= 29) & (df['N5'] <= 29) |
+		(df['N2'] >= 20) & (df['N2'] <= 29) & (df['N3'] <= 29) & (df['N4'] <= 29) & (df['N5'] <= 29) & (df['N6'] <= 29)
+		]
+	len_df_temp = len(df_temp)
+	if len_df_temp:
+		print('- тиражи, в которых выпали пять номеров из третьего десятка, (всего', len_df_temp, 'шт):')
+		print(df_temp.tail(ANOMAL_DRAWING), '\n')
+	# пять номеров из четвёртого десятка
+	df_temp = df[
+		(df['N1'] >= 30) & (df['N1'] <= 39) & (df['N2'] <= 39) & (df['N3'] <= 39) & (df['N4'] <= 39) & (df['N5'] <= 39) |
+		(df['N2'] >= 30) & (df['N2'] <= 39) & (df['N3'] <= 39) & (df['N4'] <= 39) & (df['N5'] <= 39) & (df['N6'] <= 39)
+		]
+	len_df_temp = len(df_temp)
+	if len_df_temp:
+		print('- тиражи, в которых выпали пять номеров из четвёртого десятка, (всего', len_df_temp, 'шт):')
+		print(df_temp.tail(ANOMAL_DRAWING), '\n')
+	# пять номеров из пятого десятка
+	df_temp = df[(df['N2'] >= 40) & (df['N2'] <= 49) & (df['N3'] <= 49) & (df['N4'] <= 49) & (df['N5'] <= 49) & (df['N6'] <= 49)]
+	len_df_temp = len(df_temp)
+	if len_df_temp:
+		print('- тиражи, в которых выпали пять номеров из пятого десятка, (всего', len_df_temp, 'шт):')
+		print(df_temp.tail(ANOMAL_DRAWING), '\n')
+	# шесть номеров из первого десятка
+	df_temp = df[(df['N1'] <= 9) & (df['N2'] <= 9) & (df['N3'] <= 9) & (df['N4'] <= 9) & (df['N5'] <= 9) & (df['N6'] <= 9)]
+	len_df_temp = len(df_temp)
+	if len_df_temp:
+		print('- тиражи, в которых выпали шесть номеров из первого десятка, (всего', len_df_temp, 'шт):')
+		print(df_temp.tail(ANOMAL_DRAWING), '\n')
+	# шесть номеров из второго десятка
+	df_temp = df[(df['N1'] >= 10) & (df['N1'] <= 19) & (df['N2'] <= 19) & (df['N3'] <= 19) & (df['N4'] <= 19) & (df['N5'] <= 19) & (df['N6'] <= 19)]
+	len_df_temp = len(df_temp)
+	if len_df_temp:
+		print('- тиражи, в которых выпали шесть номеров из второго десятка, (всего', len_df_temp, 'шт):')
+		print(df_temp.tail(ANOMAL_DRAWING), '\n')
+	# шесть номеров из третьего десятка
+	df_temp = df[(df['N1'] >= 20) & (df['N1'] <= 29) & (df['N2'] <= 29) & (df['N3'] <= 29) & (df['N4'] <= 29) & (df['N5'] <= 29) & (df['N6'] <= 29)]
+	len_df_temp = len(df_temp)
+	if len_df_temp:
+		print('- тиражи, в которых выпали шесть номеров из третьего десятка, (всего', len_df_temp, 'шт):')
+		print(df_temp.tail(ANOMAL_DRAWING), '\n')
+	# шесть номеров из четвёртого десятка
+	df_temp = df[(df['N1'] >= 30) & (df['N1'] <= 39) & (df['N2'] <= 39) & (df['N3'] <= 39) & (df['N4'] <= 39) & (df['N5'] <= 39) & (df['N6'] <= 39)]
+	len_df_temp = len(df_temp)
+	if len_df_temp:
+		print('- тиражи, в которых выпали шесть номеров из четвёртого десятка, (всего', len_df_temp, 'шт):')
+		print(df_temp.tail(ANOMAL_DRAWING), '\n')
+	# шесть номеров из пятого десятка
+	df_temp = df[(df['N1'] >= 40) & (df['N1'] <= 49) & (df['N2'] <= 49) & (df['N3'] <= 49) & (df['N4'] <= 49) & (df['N5'] <= 49) & (df['N6'] <= 49)]
+	len_df_temp = len(df_temp)
+	if len_df_temp:
+		print('- тиражи, в которых выпали шесть номеров из пятого десятка, (всего', len_df_temp, 'шт):')
+		print(df_temp.tail(ANOMAL_DRAWING), '\n')
+	# все номера нечётные
+	df_temp = df[df['ODD'] == 6]
+	len_df_temp = len(df_temp)
+	if len_df_temp:
+		print('- тиражи, в которых выпали только нечётные номера (всего', len_df_temp, 'шт):')
+		print(df[df['ODD'] == 6].tail(ANOMAL_DRAWING), '\n')
+	# все номера чётные
+	df_temp = df[df['EVN'] == 6]
+	len_df_temp = len(df_temp)
+	if len_df_temp:
+		print('- тиражи, в которых выпали только чётные номера (всего', len_df_temp, 'шт):')
+		print(df[df['EVN'] == 6].tail(ANOMAL_DRAWING), '\n')
+	return 0
+
+
+def dict_with_full_statistic(df: pandas.core.frame.DataFrame) -> None:
+	"""
+	Функция собирает статистику, по расчитанным дополнительно столбцам.
+	Выполняется сортировка по частоте - самые частотные значения в начале.
+	"""
+	print('ПОЛНАЯ СТАТИСТИКА АРХИВА ТИРАЖЕЙ В СЛОВАРЯХ')
+	print('=' * 44)
+	print("- ODD: количество нечётных номеров в тираже / количество таких тиражей:")
+	print(dict(df.ODD.value_counts()), "\n")
+	print("- EVN: количество чётных номеров в тираже / количество таких тиражей:")
+	print(dict(df.EVN.value_counts()), "\n")
+	print("- RPT: количество повторов номеров из прошлого тиража / количество тиражей с повторами:")
+	print(dict(df.RPT.value_counts()), "\n")
+	print("- DIF: разность N6 минус N1 в тираже / количество тиражей с такими разностями:")
+	print(dict(df.DIF.value_counts()), "\n")
+	print("- SUM: сумма номеров с N1 по N6 в тираже / количество тиражей с такими суммами:")
+	print(dict(df.SUM.value_counts()), "\n")
+	print("- DEC: распределение номеров тиража по десяткам / количество тиражей с таким распределением:")
+	print(dict(df.DEC.value_counts()), "\n\n")
+
+

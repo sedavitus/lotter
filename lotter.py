@@ -1,9 +1,10 @@
 import configparser
 import datetime  # для расчёта 'текущей даты'
-from time import sleep   # для засыпания перед нештатным exit()
+from time import sleep  # для засыпания перед нештатным exit()
 import pandas as pd
-import numpy as np
+import numpy as np  # для сортировки
 import math
+import matplotlib.pyplot as plt
 
 from dateutil.parser import parse  # для расчётов 'сколько дней назад выпадал номер'
 import json
@@ -11,18 +12,6 @@ import json
 # import secrets
 
 import lotter_func as fn  # основные функции проекта вынесены в lotter_func.py
-
-
-# Чтение параметров из lotter.ini
-config = configparser.ConfigParser()  # создание объекта парсера
-config.read("lotter.ini")
-MIN = int(config["Lottery"]["MIN"])
-MAX = int(config["Lottery"]["MAX"])
-USER_AMOUNT_DRAWING = int(config["Analyze"]["USER_AMOUNT_DRAWING"])
-if MIN != 6 or MAX != 49:
-    print('В файле \'lotter.ini\' установлены некорректные настройки!\nПроверьте параметры MIN и MAX!')
-    sleep(5)
-    exit()
 
 
 # Структуры, которые будут использоваться
@@ -440,6 +429,19 @@ drawing_data = {
     }
 
 
+# Чтение параметров из lotter.ini
+config = configparser.ConfigParser()  # создание объекта парсера
+config.read("lotter.ini")
+MIN = int(config["Lottery"]["MIN"])
+MAX = int(config["Lottery"]["MAX"])
+
+USER_AMOUNT_DRAWING = int(config["Analyze"]["USER_AMOUNT_DRAWING"])
+ANOMAL_DRAWING = int(config["Analyze"]["ANOMAL_DRAWING"])
+if MIN != 6 or MAX != 49:
+    print('В файле \'lotter.ini\' установлены некорректные настройки!\nПроверьте параметры MIN и MAX!')
+    sleep(5)
+    exit()
+
 # Проверка наличия доступного архива тиражей
 fn.check_lotter_results_xlsx()
 
@@ -447,6 +449,27 @@ fn.check_lotter_results_xlsx()
 now_date = datetime.date.today().isoformat()
 
 print('\nLOTTER', '*' * 25, MIN, 'из', MAX,  '*' * 25, now_date, '\n')
+print("""Используемые сокращения:
+\tBYN3 - вознаграждение за 3 угаданных номера, BYN;
+\tBYN4 - вознаграждение за 4 угаданных номера, BYN;
+\tBYN5 - вознаграждение за 5 угаданных номеров, BYN;
+\tBYN6 - вознаграждение за 6 угаданных номеров, BYN;
+\tDATE - дата проведения тиража;
+\tDEC - 'декады' - например, DEC=012234 для 5,10,25,27,35,40;
+\tDIF - разность между самым маленьким и самым большим номером;
+\tDRAW - номер тиража;
+\tEVN - количество чётных номеров в тираже;
+\tFOND - призовой фонд, BYN;
+\tFR1...FR6 - частота выпадения номера;
+\tJACK - джек-пот, BYN;
+\tN1...N6 - выигрышные номера;
+\tODD - количество нечётных номеров в тираже;
+\tRPT - количество повторившихся номеров из предыдущего тиража;
+\tSUM - сумма всех номеров в тираже;
+\tWIN3 - количество игроков, угадавших 3 номера;
+\tWIN4 - количество игроков, угадавших 4 номера;
+\tWIN5 - количество игроков, угадавших 5 номеров;
+\tWIN6 - количество игроков, угадавших 6 номеров.""")
 
 # Настройки для вывода Pandas в консоль:
 pd.set_option('display.max_rows', None)
@@ -473,23 +496,27 @@ amount_of_draws = len(df)
 fn.full_database_statistic(MIN, MAX, df)
 # Распределение 'горячих' и 'холодных' номеров по каналам
 fn.hot_cold_full_database(df)
+# Построение графика 'Распределение номеров по каналам'
+df_freq_all_chanels = pd.read_csv("lotter_results.tmp")  # index_col=False менее наглядно
+fn.graph_channels_full_database(df_freq_all_chanels)
 
 # Результаты последнего тиража:
 fn.last_drawing_statistic(amount_of_draws, df)
-
 # Результаты X последних тиражей:
 fn.results_of_x_last_drawing(USER_AMOUNT_DRAWING, df)
 
 # Упрощение датафрейма (ненужные для расчётов столбцы исключаются):
-# df = pd.read_csv('lotter_results.csv', index_col='DRAW', usecols=['DRAW', 'DATE', 'N1', 'N2', 'N3', 'N4', 'N5', 'N6'])
-# df.to_csv('lotter_results.tmp', encoding='utf-8')
+df = pd.read_csv('lotter_results.csv', index_col='DRAW', usecols=['DRAW', 'DATE', 'N1', 'N2', 'N3', 'N4', 'N5', 'N6'])
+# В датафрейм (после расчёта) добавляются дополнительные столбцы:
+fn.add_columns_to_database(df)
+# Вывод самых необычных результатов тиражей
+fn.anomal_results_drawing(ANOMAL_DRAWING, df)
 
-# В датафрейм после расчёта добавляются дополнительные столбцы:
-fn.add_columns_database(df)
-
-print(df.tail(10), '\n')
+# Полная статистика архива тиражей в словарях
+fn.dict_with_full_statistic(df)
 
 
 
 
+# print(df.tail(10), '\n')
 input('Для завершения нажмите ENTER...')
