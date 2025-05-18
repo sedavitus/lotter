@@ -5,11 +5,13 @@ import pandas as pd
 import numpy as np  # для сортировки
 import math
 import matplotlib.pyplot as plt
-
 from dateutil.parser import parse  # для расчётов 'сколько дней назад выпадал номер'
 import json
-# import os
+import os
+import platform  # для открытия файла отчёта в доступном текстовом редакторе
+
 # import secrets
+import sys  # перенаправления stdout с консоли в файл
 
 import lotter_func as fn  # основные функции проекта вынесены в lotter_func.py
 
@@ -448,6 +450,14 @@ fn.check_lotter_results_xlsx()
 # Получение текущей даты
 now_date = datetime.date.today().isoformat()
 
+'''
+# Для вывода отчёта в файл, часть 1 из 2:
+print('\nLOTTER', '*' * 25, MIN, 'из', MAX,  '*' * 25, now_date, '\n')
+print('Ожидайте, формируется отчёт...')
+# перенаправление stdout для записи консольного вывода в файл
+sys.stdout = open('lotter_console.txt', 'w')
+'''
+
 print('\nLOTTER', '*' * 25, MIN, 'из', MAX,  '*' * 25, now_date, '\n')
 print("""Используемые сокращения:
 \tBYN3 - вознаграждение за 3 угаданных номера, BYN;
@@ -469,7 +479,7 @@ print("""Используемые сокращения:
 \tWIN3 - количество игроков, угадавших 3 номера;
 \tWIN4 - количество игроков, угадавших 4 номера;
 \tWIN5 - количество игроков, угадавших 5 номеров;
-\tWIN6 - количество игроков, угадавших 6 номеров.""")
+\tWIN6 - количество игроков, угадавших 6 номеров.""", '\n')  # , file = f
 
 # Настройки для вывода Pandas в консоль:
 pd.set_option('display.max_rows', None)
@@ -498,12 +508,12 @@ fn.full_database_statistic(MIN, MAX, df)
 fn.hot_cold_full_database(df)
 # Построение графика 'Распределение номеров по каналам'
 df_freq_all_chanels = pd.read_csv("lotter_results.tmp")  # index_col=False менее наглядно
-fn.graph_channels_full_database(df_freq_all_chanels)
+### fn.graph_channels_full_database(df_freq_all_chanels)
 
 # Результаты последнего тиража:
 fn.last_drawing_statistic(amount_of_draws, df)
 # Результаты X последних тиражей:
-fn.results_of_x_last_drawing(USER_AMOUNT_DRAWING, df)
+fn.results_of_x_last_drawing(USER_AMOUNT_DRAWING, df, 'N6')
 
 # Упрощение датафрейма (ненужные для расчётов столбцы исключаются):
 df = pd.read_csv('lotter_results.csv', index_col='DRAW', usecols=['DRAW', 'DATE', 'N1', 'N2', 'N3', 'N4', 'N5', 'N6'])
@@ -511,12 +521,24 @@ df = pd.read_csv('lotter_results.csv', index_col='DRAW', usecols=['DRAW', 'DATE'
 fn.add_columns_to_database(df)
 # Вывод самых необычных результатов тиражей
 fn.anomal_results_drawing(ANOMAL_DRAWING, df)
+# Результаты X последних тиражей с дополнительными столбцами:
+fn.results_of_x_last_drawing(USER_AMOUNT_DRAWING, df, 'SUM')
 
 # Полная статистика архива тиражей в словарях
 fn.dict_with_full_statistic(df)
 
 
-
-
-# print(df.tail(10), '\n')
 input('Для завершения нажмите ENTER...')
+
+'''
+# для вывода отчёта в файл, часть 2 из 2
+# восстановление стандартного stdout
+sys.stdout = sys.__stdout__
+print("Завершено, отчёт записан в файл 'lotter_console.txt'")
+
+# открыть lotter_console.txt в доступном текстовом редакторе
+if platform.system() == "Windows" or platform.system() == "win32":
+    os.system('notepad.exe lotter_console.txt')
+if platform.system() == "Linux":
+    os.system('nano lotter_console.txt')
+'''
