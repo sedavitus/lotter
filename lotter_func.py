@@ -206,7 +206,7 @@ def graph_channels_full_database(df: pandas.core.frame.DataFrame):
 	plt.grid(True)
 	plt.legend(loc='best', fontsize=10)
 	fig.savefig("lotter_graph_6_channels.png", transparent=False, dpi=600)
-	# график не показывать
+	# график показывать / не показывать
 	# plt.show()
 	return 0
 
@@ -435,3 +435,66 @@ def dict_with_full_statistic(df: pandas.core.frame.DataFrame) -> None:
 	print(dict(df.SUM.value_counts()), "\n")
 	print("- DEC: распределение номеров тиража по десяткам / количество тиражей с таким распределением:")
 	print(dict(df.DEC.value_counts()), "\n\n")
+
+
+def graph_from_dict(df: pandas.core.frame.DataFrame,
+                    df_column: str,
+					graph_title: str,
+                    graph_x: str,
+                    graph_y: str,
+					graph_color: str,
+                    graph_legend: str,
+                    graph_file_name: str) -> None:
+	"""
+	Построение графика по данным из словаря ('ключ' / 'значение')
+	df - датафрейм
+	df_column - название столбца датафрейма
+	graph_title - название графика
+	graph_x - название оси X
+	graph_y - название оси Y
+	graph_color - цвет графика (доступно 'r', 'g', 'b')
+	graph_legend - 'легенда' графика
+	graph_file_name - имя файла.png (обязательно *.png)
+	"""
+	d = dict(sorted(df[df_column].value_counts().items(), key=lambda x: x[1], reverse=True))
+	# чтобы не учитывать ничтожно малые значения, исключить их из словаря
+	for key, value in dict(d).items():
+		if value < 15:
+			del d[key]
+
+	print('-', graph_title, '\n', d, '\n')
+	fig, ax = plt.subplots()
+	plt.bar(d.keys(), d.values(), color=graph_color, label=graph_legend)  # plt.bar, plt.plot
+	plt.xlabel(graph_x)
+	plt.xticks(rotation=90)
+	plt.ylabel(graph_y)
+	plt.title(graph_title)
+	plt.grid(True)
+	plt.legend(loc='best', fontsize=10)
+	fig.savefig(graph_file_name, transparent=False, dpi=600)
+	# график показывать / не показывать
+	plt.show()
+	return 0
+
+
+'''
+def graph_from_dict(df: pandas.core.frame.DataFrame, COLUMN: str) -> None:
+	"""
+	Построение графика по данным из словаря ('ключ' / 'значение')
+	"""
+	d = dict(sorted(df[COLUMN].value_counts().items(), key=lambda x: x[0], reverse=False))
+	print(d)
+	fig, ax = plt.subplots()
+	plt.bar(d.keys(), d.values(), color='g', label='количество\nнечётных\nномеров')
+	plt.xlabel(r'$нечётных номеров в тираже$')
+	plt.xticks(rotation=0)
+	plt.ylabel(r'$количество тиражей$')
+	plt.title(r'количество нечётных номеров в тираже')
+	plt.grid(True)
+	plt.legend(loc='best', fontsize=10)
+	fig.savefig("lotter_graph_odd_numbers.png", transparent=False, dpi=600)
+	# график показывать / не показывать
+	plt.show()
+	return 0
+
+'''

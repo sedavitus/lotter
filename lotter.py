@@ -450,13 +450,13 @@ fn.check_lotter_results_xlsx()
 # Получение текущей даты
 now_date = datetime.date.today().isoformat()
 
-'''
+"""
 # Для вывода отчёта в файл, часть 1 из 2:
 print('\nLOTTER', '*' * 25, MIN, 'из', MAX,  '*' * 25, now_date, '\n')
 print('Ожидайте, формируется отчёт...')
 # перенаправление stdout для записи консольного вывода в файл
 sys.stdout = open('lotter_console.txt', 'w')
-'''
+"""
 
 print('\nLOTTER', '*' * 25, MIN, 'из', MAX,  '*' * 25, now_date, '\n')
 print("""Используемые сокращения:
@@ -508,7 +508,7 @@ fn.full_database_statistic(MIN, MAX, df)
 fn.hot_cold_full_database(df)
 # Построение графика 'Распределение номеров по каналам'
 df_freq_all_chanels = pd.read_csv("lotter_results.tmp")  # index_col=False менее наглядно
-### fn.graph_channels_full_database(df_freq_all_chanels)
+fn.graph_channels_full_database(df_freq_all_chanels)
 
 # Результаты последнего тиража:
 fn.last_drawing_statistic(amount_of_draws, df)
@@ -521,16 +521,55 @@ df = pd.read_csv('lotter_results.csv', index_col='DRAW', usecols=['DRAW', 'DATE'
 fn.add_columns_to_database(df)
 # Вывод самых необычных результатов тиражей
 fn.anomal_results_drawing(ANOMAL_DRAWING, df)
+# Полная статистика архива тиражей в словарях
+# fn.dict_with_full_statistic(df)
+
+
+# Построение графика по словарям значений из столбцов датафрейма:
+# 'DEC' распределение номеров по декадам
+fn.graph_from_dict(
+    df,
+    df_column='DEC',
+    graph_title='распределение номеров по декадам',
+    graph_x ='декада',
+    graph_y ='количество тиражей',
+    graph_color = 'r',
+    graph_legend='распределение\nпо декадам',
+    graph_file_name='lotter_graph_decades.png'
+    )
+
+# 'ODD' количество нечётных номеров в тираже
+fn.graph_from_dict(
+    df,
+    df_column='ODD',
+    graph_title='распределение нечётных номеров в тиражах',
+    graph_x ='количество нечётных номеров в одном тираже',
+    graph_y ='количество тиражей',
+    graph_color = 'b',
+    graph_legend='количество\nнечётных\nномеров',
+    graph_file_name='lotter_graph_odd_numbers.png'
+    )
+
+# 'EVN' количество чётных номеров в тираже
+fn.graph_from_dict(
+    df,
+    df_column='EVN',
+    graph_title='распределение чётных номеров в тиражах',
+    graph_x ='количество чётных номеров в одном тираже',
+    graph_y ='количество тиражей',
+    graph_color = 'g',
+    graph_legend='количество\nчётных\nномеров',
+    graph_file_name='lotter_graph_evn_numbers.png'
+    )
+
+
+
 # Результаты X последних тиражей с дополнительными столбцами:
 fn.results_of_x_last_drawing(USER_AMOUNT_DRAWING, df, 'SUM')
 
-# Полная статистика архива тиражей в словарях
-fn.dict_with_full_statistic(df)
-
-
 input('Для завершения нажмите ENTER...')
 
-'''
+"""
 # для вывода отчёта в файл, часть 2 из 2
 # восстановление стандартного stdout
 sys.stdout = sys.__stdout__
@@ -541,4 +580,4 @@ if platform.system() == "Windows" or platform.system() == "win32":
     os.system('notepad.exe lotter_console.txt')
 if platform.system() == "Linux":
     os.system('nano lotter_console.txt')
-'''
+"""
