@@ -526,7 +526,7 @@ fn.anomal_results_drawing(ANOMAL_DRAWING, df)
 
 
 # Построение графика по словарям значений из столбцов датафрейма:
-# 'DEC' распределение номеров по декадам
+# 'DEC': распределение номеров по декадам
 fn.graph_from_dict(
     df,
     df_column='DEC',
@@ -538,7 +538,7 @@ fn.graph_from_dict(
     graph_file_name='lotter_graph_decades.png'
     )
 
-# 'ODD' количество нечётных номеров в тираже
+# 'ODD': количество нечётных номеров в тираже
 fn.graph_from_dict(
     df,
     df_column='ODD',
@@ -550,7 +550,7 @@ fn.graph_from_dict(
     graph_file_name='lotter_graph_odd_numbers.png'
     )
 
-# 'EVN' количество чётных номеров в тираже
+# 'EVN': количество чётных номеров в тираже
 fn.graph_from_dict(
     df,
     df_column='EVN',
@@ -562,6 +562,41 @@ fn.graph_from_dict(
     graph_file_name='lotter_graph_evn_numbers.png'
     )
 
+# 'RPT': количество повторов номеров из предыдущего тиража
+fn.graph_from_dict(
+    df,
+    df_column='RPT',
+    graph_title='количество повторов номеров из предыдущего тиража',
+    graph_x ='количество повторов номеров',
+    graph_y ='количество тиражей',
+    graph_color = 'r',
+    graph_legend='количество\nповторов\nномеров',
+    graph_file_name='lotter_graph_repeat_numbers.png'
+    )
+
+# 'DIF': разность между номерами N6 и N1
+fn.graph_from_dict(
+    df,
+    df_column='DIF',
+    graph_title='разность между номерами N6 и N1',
+    graph_x ='разность номеров N6 минус N1',
+    graph_y ='количество тиражей',
+    graph_color = 'g',
+    graph_legend='величина\nразности\nномеров',
+    graph_file_name='lotter_graph_difference_numbers.png'
+    )
+
+# 'SUM': сумма выпавших в тираже номеров
+fn.graph_from_dict(
+    df,
+    df_column='SUM',
+    graph_title='сумма выпавших в тираже номеров N1 ... N6',
+    graph_x ='сумма выпавших в тираже номеров',
+    graph_y ='количество тиражей',
+    graph_color = 'b',
+    graph_legend='величина\nсуммы\nномеров',
+    graph_file_name='lotter_graph_summ_numbers.png'
+    )
 
 
 # Результаты X последних тиражей с дополнительными столбцами:
