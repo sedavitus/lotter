@@ -436,13 +436,15 @@ config = configparser.ConfigParser()  # создание объекта парс
 config.read("lotter.ini")
 MIN = int(config["Lottery"]["MIN"])
 MAX = int(config["Lottery"]["MAX"])
-
+ANALYZE_THIS = int(config["Analyze"]["ANALYZE_THIS"])
+GRAPH_STAT = int(config["Analyze"]["GRAPH_STAT"])
 USER_AMOUNT_DRAWING = int(config["Analyze"]["USER_AMOUNT_DRAWING"])
 ANOMAL_DRAWING = int(config["Analyze"]["ANOMAL_DRAWING"])
 if MIN != 6 or MAX != 49:
     print('В файле \'lotter.ini\' установлены некорректные настройки!\nПроверьте параметры MIN и MAX!')
     sleep(5)
     exit()
+
 
 # Проверка наличия доступного архива тиражей
 fn.check_lotter_results_xlsx()
@@ -506,97 +508,99 @@ amount_of_draws = len(df)
 fn.full_database_statistic(MIN, MAX, df)
 # Распределение 'горячих' и 'холодных' номеров по каналам
 fn.hot_cold_full_database(df)
-# Построение графика 'Распределение номеров по каналам'
-df_freq_all_chanels = pd.read_csv("lotter_results.tmp")  # index_col=False менее наглядно
-fn.graph_channels_full_database(df_freq_all_chanels)
+
+if GRAPH_STAT > 0:
+    # Построение графика 'Распределение номеров по каналам'
+    df_freq_all_chanels = pd.read_csv("lotter_results.tmp")  # index_col=False менее наглядно
+    fn.graph_channels_full_database(df_freq_all_chanels)
+    del df_freq_all_chanels
 
 # Результаты последнего тиража:
 fn.last_drawing_statistic(amount_of_draws, df)
 # Результаты X последних тиражей:
-fn.results_of_x_last_drawing(USER_AMOUNT_DRAWING, df, 'N6')
+# (сейчас отключено т.к. ниже показываются в более интересном варианте)
+# fn.results_of_x_last_drawing(USER_AMOUNT_DRAWING, df, 'N6')
 
 # Упрощение датафрейма (ненужные для расчётов столбцы исключаются):
 df = pd.read_csv('lotter_results.csv', index_col='DRAW', usecols=['DRAW', 'DATE', 'N1', 'N2', 'N3', 'N4', 'N5', 'N6'])
 # В датафрейм (после расчёта) добавляются дополнительные столбцы:
 fn.add_columns_to_database(df)
-# Вывод самых необычных результатов тиражей
-fn.anomal_results_drawing(ANOMAL_DRAWING, df)
-# Полная статистика архива тиражей в словарях
-# fn.dict_with_full_statistic(df)
 
+# Вывод самых необычных результатов тиражей
+if ANALYZE_THIS > 0:
+    fn.anomal_results_drawing(ANOMAL_DRAWING, df)
 
 # Построение графика по словарям значений из столбцов датафрейма:
-# 'DEC': распределение номеров по декадам
-fn.graph_from_dict(
-    df,
-    df_column='DEC',
-    graph_title='распределение номеров по декадам',
-    graph_x ='декада',
-    graph_y ='количество тиражей',
-    graph_color = 'r',
-    graph_legend='распределение\nпо декадам',
-    graph_file_name='lotter_graph_decades.png'
-    )
+if GRAPH_STAT > 0:
+    # 'DEC': распределение номеров по декадам
+    fn.graph_from_dict(
+        df,
+        df_column='DEC',
+        graph_title='распределение номеров по декадам',
+        graph_x ='декада',
+        graph_y ='количество тиражей',
+        graph_color = 'r',
+        graph_legend='распределение\nпо декадам',
+        graph_file_name='lotter_graph_decades.png'
+        )
+    # 'ODD': количество нечётных номеров в тираже
+    fn.graph_from_dict(
+        df,
+        df_column='ODD',
+        graph_title='распределение нечётных номеров в тиражах',
+        graph_x ='количество нечётных номеров в одном тираже',
+        graph_y ='количество тиражей',
+        graph_color = 'b',
+        graph_legend='количество\nнечётных\nномеров',
+        graph_file_name='lotter_graph_odd_numbers.png'
+        )
+    # 'EVN': количество чётных номеров в тираже
+    fn.graph_from_dict(
+        df,
+        df_column='EVN',
+        graph_title='распределение чётных номеров в тиражах',
+        graph_x ='количество чётных номеров в одном тираже',
+        graph_y ='количество тиражей',
+        graph_color = 'g',
+        graph_legend='количество\nчётных\nномеров',
+        graph_file_name='lotter_graph_evn_numbers.png'
+        )
+    # 'RPT': количество повторов номеров из предыдущего тиража
+    fn.graph_from_dict(
+        df,
+        df_column='RPT',
+        graph_title='количество повторов номеров из предыдущего тиража',
+        graph_x ='количество повторов номеров',
+        graph_y ='количество тиражей',
+        graph_color = 'r',
+        graph_legend='количество\nповторов\nномеров',
+        graph_file_name='lotter_graph_repeat_numbers.png'
+        )
+    # 'DIF': разность между номерами N6 и N1
+    fn.graph_from_dict(
+        df,
+        df_column='DIF',
+        graph_title='разность между номерами N6 и N1',
+        graph_x ='разность номеров N6 минус N1',
+        graph_y ='количество тиражей',
+        graph_color = 'g',
+        graph_legend='величина\nразности\nномеров',
+        graph_file_name='lotter_graph_difference_numbers.png'
+        )
+    # 'SUM': сумма выпавших в тираже номеров
+    fn.graph_from_dict(
+        df,
+        df_column='SUM',
+        graph_title='сумма выпавших в тираже номеров N1 ... N6',
+        graph_x ='сумма выпавших в тираже номеров',
+        graph_y ='количество тиражей',
+        graph_color = 'b',
+        graph_legend='величина\nсуммы\nномеров',
+        graph_file_name='lotter_graph_summ_numbers.png'
+        )
 
-# 'ODD': количество нечётных номеров в тираже
-fn.graph_from_dict(
-    df,
-    df_column='ODD',
-    graph_title='распределение нечётных номеров в тиражах',
-    graph_x ='количество нечётных номеров в одном тираже',
-    graph_y ='количество тиражей',
-    graph_color = 'b',
-    graph_legend='количество\nнечётных\nномеров',
-    graph_file_name='lotter_graph_odd_numbers.png'
-    )
-
-# 'EVN': количество чётных номеров в тираже
-fn.graph_from_dict(
-    df,
-    df_column='EVN',
-    graph_title='распределение чётных номеров в тиражах',
-    graph_x ='количество чётных номеров в одном тираже',
-    graph_y ='количество тиражей',
-    graph_color = 'g',
-    graph_legend='количество\nчётных\nномеров',
-    graph_file_name='lotter_graph_evn_numbers.png'
-    )
-
-# 'RPT': количество повторов номеров из предыдущего тиража
-fn.graph_from_dict(
-    df,
-    df_column='RPT',
-    graph_title='количество повторов номеров из предыдущего тиража',
-    graph_x ='количество повторов номеров',
-    graph_y ='количество тиражей',
-    graph_color = 'r',
-    graph_legend='количество\nповторов\nномеров',
-    graph_file_name='lotter_graph_repeat_numbers.png'
-    )
-
-# 'DIF': разность между номерами N6 и N1
-fn.graph_from_dict(
-    df,
-    df_column='DIF',
-    graph_title='разность между номерами N6 и N1',
-    graph_x ='разность номеров N6 минус N1',
-    graph_y ='количество тиражей',
-    graph_color = 'g',
-    graph_legend='величина\nразности\nномеров',
-    graph_file_name='lotter_graph_difference_numbers.png'
-    )
-
-# 'SUM': сумма выпавших в тираже номеров
-fn.graph_from_dict(
-    df,
-    df_column='SUM',
-    graph_title='сумма выпавших в тираже номеров N1 ... N6',
-    graph_x ='сумма выпавших в тираже номеров',
-    graph_y ='количество тиражей',
-    graph_color = 'b',
-    graph_legend='величина\nсуммы\nномеров',
-    graph_file_name='lotter_graph_summ_numbers.png'
-    )
+# Полная статистика архива тиражей в словарях
+# fn.dict_with_full_statistic(df)
 
 
 # Результаты X последних тиражей с дополнительными столбцами:

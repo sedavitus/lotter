@@ -256,7 +256,13 @@ def results_of_x_last_drawing(USER_AMOUNT_DRAWING: int, df: pandas.core.frame.Da
 
 def add_columns_to_database(df: pandas.core.frame.DataFrame) -> None:
 	"""
-	Добавление в датафрейм дополнительных столбцов
+	Добавление в датафрейм дополнительных столбцов. Добавляются:
+	DEC - распределение выпавших номеров по десяткам;
+	ODD - количество нечётных номеров;
+	EVN - количество чётных номеров;
+	RPT - количество повторившихся номеров из прошлого тиража;
+	DIF - разница между самым большим и самым маленьким номерами: N6 - N1;
+	SUM - сумма всех номеров тиража N1 + N2 + N3 + N4 + N5 + N6
 	"""
 	# print('РАСЧЁТ И ДОБАВЛЕНИЕ ДОПОЛНИТЕЛЬНЫХ СТОЛБЦОВ')
 	# print('=' * 44)
@@ -279,14 +285,19 @@ def add_columns_to_database(df: pandas.core.frame.DataFrame) -> None:
 		i += 1
 	# полученный список разворачивается в дополнительный столбец датафрейма
 	df['RPT'] = repeat_nums_list
-	# DIF - разница между номерами: самым большим (N6) и самым маленьким (N1)
+	# DIF - разница между номерами: самым большим N6 и самым маленьким N1
 	df['DIF'] = df['N6'] - df['N1']
-	# SUM - сумма номеров
+	# SUM - сумма всех номеров тиража N1 + N2 + N3 + N4 + N5 + N6
 	df['SUM'] = df['N1'] + df['N2'] + df['N3'] + df['N4'] + df['N5'] + df['N6']
 	return 0
 
 
 def anomal_results_drawing(ANOMAL_DRAWING: int, df: pandas.core.frame.DataFrame) -> None:
+	"""
+	Функция анализирует датафрейм на наличие в нём необычных результатов тиражей:
+	- есть ли тиражи, в которых выпало по 4, 5 или 6 номеров из одного десятка;
+	- есть ли тиражи, состоящие только из нечётных или только чётных номеров
+	"""
 	print('САМЫЕ НЕОБЫЧНЫЕ РЕЗУЛЬТАТЫ ТИРАЖЕЙ')
 	print('=' * 35)
 	print('Есть ли в архиве тиражи, в которых выпало по 4, 5, 6 номеров одного десятка?\nЕсть ли тиражи, состоящие только из нечётных или только чётных номеров?\n')
@@ -447,13 +458,13 @@ def graph_from_dict(df: pandas.core.frame.DataFrame,
                     graph_file_name: str) -> None:
 	"""
 	Построение графика по данным из словаря ('ключ' / 'значение')
-	df - датафрейм
-	df_column - название столбца датафрейма
-	graph_title - название графика
-	graph_x - название оси X
-	graph_y - название оси Y
-	graph_color - цвет графика (доступно 'r', 'g', 'b')
-	graph_legend - 'легенда' графика
+	df - датафрейм;
+	df_column - название столбца датафрейма;
+	graph_title - название графика;
+	graph_x - название оси X;
+	graph_y - название оси Y;
+	graph_color - цвет графика (доступно 'r', 'g', 'b');
+	graph_legend - 'легенда' графика;
 	graph_file_name - имя файла.png (обязательно *.png)
 	"""
 	d = dict(sorted(df[df_column].value_counts().items(), key=lambda x: x[1], reverse=True))
@@ -478,23 +489,4 @@ def graph_from_dict(df: pandas.core.frame.DataFrame,
 
 
 '''
-def graph_from_dict(df: pandas.core.frame.DataFrame, COLUMN: str) -> None:
-	"""
-	Построение графика по данным из словаря ('ключ' / 'значение')
-	"""
-	d = dict(sorted(df[COLUMN].value_counts().items(), key=lambda x: x[0], reverse=False))
-	print(d)
-	fig, ax = plt.subplots()
-	plt.bar(d.keys(), d.values(), color='g', label='количество\nнечётных\nномеров')
-	plt.xlabel(r'$нечётных номеров в тираже$')
-	plt.xticks(rotation=0)
-	plt.ylabel(r'$количество тиражей$')
-	plt.title(r'количество нечётных номеров в тираже')
-	plt.grid(True)
-	plt.legend(loc='best', fontsize=10)
-	fig.savefig("lotter_graph_odd_numbers.png", transparent=False, dpi=600)
-	# график показывать / не показывать
-	plt.show()
-	return 0
-
 '''
