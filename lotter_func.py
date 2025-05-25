@@ -62,6 +62,34 @@ def check_lotter_results_xlsx() -> None:
 	return 0
 
 
+def check_lotter_ini_const(MIN, MAX, ANALYZE_THIS, GRAPH_STAT, USER_AMOUNT_DRAWING, ANOMAL_DRAWING: int) -> None:
+	'''
+	Проверка параметров, заданных в файле lotter.ini
+	'''
+	warning_str = '\nВ файле \'lotter.ini\' установлены некорректные настройки!'
+	if MIN != 6 or MAX != 49:
+		print(warning_str, '\nПроверьте параметры MIN и MAX...')
+		sleep(5)
+		exit()
+	elif ANALYZE_THIS != 0 and ANALYZE_THIS != 1:
+		print(warning_str, '\nОжидается 0 или 1.\nПроверьте параметр ANALYZE_THIS...')
+		sleep(5)
+		exit()
+	elif GRAPH_STAT != 0 and GRAPH_STAT != 1:
+		print(warning_str, '\nОжидается 0 или 1.\nПроверьте параметр GRAPH_STAT...')
+		sleep(5)
+		exit()
+	elif USER_AMOUNT_DRAWING > 1000:
+		print(warning_str, '\nВозможен черезмерный расход системных ресурсов.\nПроверьте параметр USER_AMOUNT_DRAWING...')
+		sleep(5)
+		exit()
+	elif ANOMAL_DRAWING > 100:
+		print(warning_str, 'Возможен черезмерный расход системных ресурсов.\nПроверьте параметр ANOMAL_DRAWING...')
+		sleep(5)
+		exit()
+	return 0
+
+
 def search_in_dataframe(str_for_find: list, df: pandas.core.frame.DataFrame) -> str:
 	"""
 	Поиск по базе данных определённой последовательности номеров
@@ -237,6 +265,9 @@ def last_drawing_statistic(amount_of_draws: int, df: pandas.core.frame.DataFrame
 		print('- 3 номера не угадал никто')
 	print('- джекпот по состоянию на', df['DATE'][amount_of_draws].date(), 'составляет', df['JACK'][amount_of_draws], 'BYN', '\n')
 	return 0
+
+
+
 
 
 def results_of_x_last_drawing(USER_AMOUNT_DRAWING: int, df: pandas.core.frame.DataFrame, column_end: str) -> None:
@@ -446,6 +477,7 @@ def dict_with_full_statistic(df: pandas.core.frame.DataFrame) -> None:
 	print(dict(df.SUM.value_counts()), "\n")
 	print("- DEC: распределение номеров тиража по десяткам / количество тиражей с таким распределением:")
 	print(dict(df.DEC.value_counts()), "\n\n")
+	return 0
 
 
 def graph_from_dict(df: pandas.core.frame.DataFrame,
@@ -457,7 +489,7 @@ def graph_from_dict(df: pandas.core.frame.DataFrame,
                     graph_legend: str,
                     graph_file_name: str) -> None:
 	"""
-	Построение графика по данным из словаря ('ключ' / 'значение')
+	Построение графика по данным из словаря ('ключ' / 'значение'). Здесь:
 	df - датафрейм;
 	df_column - название столбца датафрейма;
 	graph_title - название графика;

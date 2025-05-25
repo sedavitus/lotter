@@ -434,20 +434,19 @@ drawing_data = {
 # Чтение параметров из lotter.ini
 config = configparser.ConfigParser()  # создание объекта парсера
 config.read("lotter.ini")
-MIN = int(config["Lottery"]["MIN"])
-MAX = int(config["Lottery"]["MAX"])
-ANALYZE_THIS = int(config["Analyze"]["ANALYZE_THIS"])
-GRAPH_STAT = int(config["Analyze"]["GRAPH_STAT"])
-USER_AMOUNT_DRAWING = int(config["Analyze"]["USER_AMOUNT_DRAWING"])
-ANOMAL_DRAWING = int(config["Analyze"]["ANOMAL_DRAWING"])
-if MIN != 6 or MAX != 49:
-    print('В файле \'lotter.ini\' установлены некорректные настройки!\nПроверьте параметры MIN и MAX!')
-    sleep(5)
-    exit()
-
+MIN = int(config["Lottery"]["MIN"])  # 6
+MAX = int(config["Lottery"]["MAX"])  # 49
+ANALYZE_THIS = int(config["Analyze"]["ANALYZE_THIS"])  # 1 или 0
+GRAPH_STAT = int(config["Analyze"]["GRAPH_STAT"])  # 1 или 0
+USER_AMOUNT_DRAWING = int(config["Analyze"]["USER_AMOUNT_DRAWING"])  # 18
+ANOMAL_DRAWING = int(config["Analyze"]["ANOMAL_DRAWING"])  # 3
 
 # Проверка наличия доступного архива тиражей
 fn.check_lotter_results_xlsx()
+
+# Проверка констант из файла 'lotter.ini'
+fn.check_lotter_ini_const(MIN, MAX, ANALYZE_THIS, GRAPH_STAT,
+                          USER_AMOUNT_DRAWING, ANOMAL_DRAWING)
 
 # Получение текущей даты
 now_date = datetime.date.today().isoformat()
@@ -504,6 +503,9 @@ df.to_csv('lotter_results.csv', encoding='utf-8')  # delimiter=';'
 
 amount_of_draws = len(df)
 
+
+
+
 # Общая статистика полной базы тиражей:
 fn.full_database_statistic(MIN, MAX, df)
 # Распределение 'горячих' и 'холодных' номеров по каналам
@@ -513,7 +515,7 @@ if GRAPH_STAT > 0:
     # Построение графика 'Распределение номеров по каналам'
     df_freq_all_chanels = pd.read_csv("lotter_results.tmp")  # index_col=False менее наглядно
     fn.graph_channels_full_database(df_freq_all_chanels)
-    del df_freq_all_chanels
+    del(df_freq_all_chanels)
 
 # Результаты последнего тиража:
 fn.last_drawing_statistic(amount_of_draws, df)
@@ -601,7 +603,6 @@ if GRAPH_STAT > 0:
 
 # Полная статистика архива тиражей в словарях
 # fn.dict_with_full_statistic(df)
-
 
 # Результаты X последних тиражей с дополнительными столбцами:
 fn.results_of_x_last_drawing(USER_AMOUNT_DRAWING, df, 'SUM')
