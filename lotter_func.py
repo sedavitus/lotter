@@ -1,8 +1,12 @@
+"""
+Модуль с функциями, которые используются 'Loter' лотереи '6 x 49'
+"""
 import os
 import pandas
 import matplotlib.pyplot as plt
 import math
 from time import sleep   # для засыпания перед нештатным exit()
+# import logging
 
 def check_lotter_results_xlsx() -> None:
 	"""
@@ -62,35 +66,47 @@ def check_lotter_results_xlsx() -> None:
 	return 0
 
 
-def check_lotter_ini_const(MIN, MAX, ANALYZE_THIS, GRAPH_STAT, USER_AMOUNT_DRAWING, ANOMAL_DRAWING: int) -> None:
+def check_lotter_ini_const(MIN, MAX, LEGEND,
+						   DF_STATISTIC_CLASSIC, BUILD_GRAPH,
+						   DF_STATISTIC_ANOMALIC, COUNTER_ANOMALIC_DRAWS,
+						   COUNTER_USER_ANALYZE: int) -> None:
 	'''
 	Проверка параметров, заданных в файле lotter.ini
 	'''
 	warning_str = '\nВ файле \'lotter.ini\' установлены некорректные настройки!'
 	if MIN != 6 or MAX != 49:
-		print(warning_str, '\nПроверьте параметры MIN и MAX...')
+		print(warning_str, '\nПроверьте параметры MIN и MAX.\nОжидаются 6 и 49 соответственно...')
 		sleep(5)
 		exit()
-	elif ANALYZE_THIS != 0 and ANALYZE_THIS != 1:
-		print(warning_str, '\nОжидается 0 или 1.\nПроверьте параметр ANALYZE_THIS...')
+	elif LEGEND != 0 and LEGEND != 1:
+		print(warning_str, '\nПроверьте параметр LEGEND.\nОжидается 0 или 1...')
 		sleep(5)
 		exit()
-	elif GRAPH_STAT != 0 and GRAPH_STAT != 1:
-		print(warning_str, '\nОжидается 0 или 1.\nПроверьте параметр GRAPH_STAT...')
+	elif DF_STATISTIC_CLASSIC != 0 and DF_STATISTIC_CLASSIC != 1:
+		print(warning_str, '\nПроверьте параметр DF_STATISTIC_CLASSIC.\nОжидается 0 или 1...')
 		sleep(5)
 		exit()
-	elif USER_AMOUNT_DRAWING > 1000:
-		print(warning_str, '\nВозможен черезмерный расход системных ресурсов.\nПроверьте параметр USER_AMOUNT_DRAWING...')
+	elif BUILD_GRAPH != 0 and BUILD_GRAPH != 1:
+		print(warning_str, '\nПроверьте параметр BUILD_GRAPH.\nОжидается 0 или 1...')
 		sleep(5)
 		exit()
-	elif ANOMAL_DRAWING > 100:
-		print(warning_str, 'Возможен черезмерный расход системных ресурсов.\nПроверьте параметр ANOMAL_DRAWING...')
+	elif DF_STATISTIC_ANOMALIC != 0 and DF_STATISTIC_ANOMALIC != 1:
+		print(warning_str, '\nПроверьте параметр DF_STATISTIC_ANOMALIC.\nОжидается 0 или 1...')
+		sleep(5)
+		exit()
+	elif COUNTER_ANOMALIC_DRAWS > 100:
+		print(warning_str, 'Проверьте параметр COUNTER_ANOMALIC_DRAWS.\nВозможен черезмерный расход системных ресурсов...')
+		sleep(5)
+		exit()
+	elif COUNTER_USER_ANALYZE > 1000:
+		print(warning_str, '\nПроверьте параметр COUNTER_USER_ANALYZE.\nВозможен черезмерный расход системных ресурсов...')
 		sleep(5)
 		exit()
 	return 0
 
 
-def search_in_dataframe(str_for_find: list, df: pandas.core.frame.DataFrame) -> str:
+def search_in_dataframe(str_for_find: list,
+						df: pandas.core.frame.DataFrame) -> str:
 	"""
 	Поиск по базе данных определённой последовательности номеров
 	"""
@@ -103,10 +119,21 @@ def search_in_dataframe(str_for_find: list, df: pandas.core.frame.DataFrame) -> 
 	return result
 
 
-def full_database_statistic(MIN: int, MAX: int, df: pandas.core.frame.DataFrame) -> None:
+def df_statistic_classic(MIN: int,
+						 MAX: int,
+						 df: pandas.core.frame.DataFrame) -> None:
 	"""
-	Получение статистических данных полного архива тиражей
-	(начиная с первого тиража базы и до самого последнего)
+	Получение статистических данных архива базы тиражей
+	(Среди всего прочего, будет использована функция df.describe(), которая
+	подсчитывает следующие параметры:
+	"count" - число непропущенных значений датафрейма;
+	"std" - стандартн.отклонение, среднеквадратичный разброс относительно мат.ожидания;
+	"min" - минимальное значение в датафрейме;
+	"25%" - нижний процентиль, 25% значений в датафрейме меньше этого значения;
+	"50%" - 0.5 процентиль, среднее значение;
+	"mean" - медиана, одна половина значений меньше неё, а другая половина больше;
+	"75%" - верхний процентиль, 75% значений в датафрейме меньше этого значения;
+	"max" - максимальное значение в датафрейме)
 	"""
 	print('ОБЩАЯ СТАТИСТИКА ПОЛНОЙ БАЗЫ ТИРАЖЕЙ')
 	print('=' * 36)
@@ -150,7 +177,7 @@ def full_database_statistic(MIN: int, MAX: int, df: pandas.core.frame.DataFrame)
 def add_0_to_not_full_dict(not_full_dict: dict) -> dict:
 	"""
 	Это вспомогательная функция.
-	Нужна для функции 'hot_cold_full_database', которая (используя понятие
+	Нужна для функции 'df_hot_cold_numbers', которая (используя понятие
 	'каналов' - о них см. ниже) подсчитывает 'горячие' и 'холодные' номера
 	всего архива тиражей.
 	Функция 'add_0_to_not_full_dict' заполняет 'неполные' словари (размер
@@ -174,11 +201,11 @@ def add_0_to_not_full_dict(not_full_dict: dict) -> dict:
 	return not_full_dict
 
 
-def hot_cold_full_database(df: pandas.core.frame.DataFrame) -> None:
+def df_hot_cold_numbers(df: pandas.core.frame.DataFrame) -> None:
 	"""
-	Подсчёт 'горячих' и 'холодных' номеров по 6 'каналам' для всех тиражей.
-	Концепция 'канала' проста: в каждом тираже выпавшие номера сортируются
-	по возрастанию. Это попытка существенно уменьшить количество возможных
+	Подсчёт 'горячих' и 'холодных' номеров по 6 'каналам' для тиражей из df.
+	Концепция 'канала': в каждом тираже выпавшие номера сортируются по
+	возрастанию. Это попытка существенно уменьшить количество возможных
 	комбинаций. (Номера выпадают, конечно, не по порядку. Однако результат
 	всегда подаётся как упорядоченная последовательность. Будь то 234561,
 	или 345612, или 456123, или 561234... - результат одинаковый - 123456).
@@ -186,9 +213,9 @@ def hot_cold_full_database(df: pandas.core.frame.DataFrame) -> None:
 	номеров и делаются соответствующие выводы: какие номера чаще других
 	выпадают в том или ином 'канале'.
 	"""
-	print("- распределение 'горячих' / 'холодных' номеров по 'каналам', где:")
-	print("\tN1...N6 - выпавшие номера или названия 'каналов'")
-	print("\tFR1...FR6 - частота выпадения номера в 'канале'\n")
+	###print("- распределение 'горячих' / 'холодных' номеров по 'каналам', где:")
+	###print("\tN1...N6 - выпавшие номера или названия 'каналов'")
+	###print("\tFR1...FR6 - частота выпадения номера в 'канале'\n")
 	# с помощью value_counts() можно подсчитать частоту появления номеров по каждому из каналов
 	# и сформировать новый dataframe_freq_all_chanels с общим результатом по всем каналам
 	# т.к. при формировании датафрейма данные д.быть одного размера (а в каналах есть не все номера),
@@ -212,21 +239,30 @@ def hot_cold_full_database(df: pandas.core.frame.DataFrame) -> None:
 	df_freq_all_chanels = pandas.DataFrame(dict_freq_all_chanels)
 	# запись во временный файл 'loter_results.tmp' чтобы избавиться от ненужного индексного столбца
 	df_freq_all_chanels.to_csv('lotter_results.tmp', header=True, index=False, lineterminator=',\n', encoding='utf8')  # sep=';',
-	print(df_freq_all_chanels.head(13), '\n')  # даже более 13-ти строк выводить нет смысла - появляются повторы в соседних каналах
+	###print(df_freq_all_chanels.head(13), '\n')  # даже более 13-ти строк выводить нет смысла - появляются повторы в соседних каналах
 	return 0
 
 
-def graph_channels_full_database(df: pandas.core.frame.DataFrame):
+def graph_df_all_channels(df: pandas.core.frame.DataFrame):
 	"""
 	Построение графика 'Распределение номеров по каналам'
+
+	Using categorical units to plot a list of strings
+	that are all parsable as floats or dates.
+	If these strings should be plotted as numbers,
+	cast to the appropriate data type before plotting.
+	Использовать категориальные единицы для построения списка строк,
+	которые можно интерпретировать как числа с плавающей точкой или даты.
+	Если эти строки необходимо отобразить как числа, перед построением
+	графика приведите их к соответствующему типу данных.
 	"""
 	fig, ax = plt.subplots()
-	df.groupby('N1')['FR1'].mean().plot(label=r'$канал\ N1$')
-	df.groupby('N2')['FR2'].mean().plot(label=r'$канал\ N2$')
-	df.groupby('N3')['FR3'].mean().plot(label=r'$канал\ N3$')
-	df.groupby('N4')['FR4'].mean().plot(label=r'$канал\ N4$')
-	df.groupby('N5')['FR5'].mean().plot(label=r'$канал\ N5$')
-	df.groupby('N6')['FR6'].mean().plot(label=r'$канал\ N6$')
+	df.groupby('N1')['FR1'].mean().astype(int).plot(label=r'$канал\ N1$')
+	df.groupby('N2')['FR2'].mean().astype(int).plot(label=r'$канал\ N2$')
+	df.groupby('N3')['FR3'].mean().astype(int).plot(label=r'$канал\ N3$')
+	df.groupby('N4')['FR4'].mean().astype(int).plot(label=r'$канал\ N4$')
+	df.groupby('N5')['FR5'].mean().astype(int).plot(label=r'$канал\ N5$')
+	df.groupby('N6')['FR6'].mean().astype(int).plot(label=r'$канал\ N6$')
 	plt.xlabel(r'$номера$')
 	plt.xticks(rotation=0)
 	plt.ylabel(r'$частота$')
@@ -236,15 +272,17 @@ def graph_channels_full_database(df: pandas.core.frame.DataFrame):
 	fig.savefig("lotter_graph_6_channels.png", transparent=False, dpi=600)
 	# график показывать / не показывать
 	# plt.show()
+	# print('- построен график "распределение номеров по 6 каналам"')
 	return 0
 
 
-def last_drawing_statistic(amount_of_draws: int, df: pandas.core.frame.DataFrame) -> None:
+def last_drawing_statistic(df: pandas.core.frame.DataFrame) -> None:
 	"""
 	Получение отчёта с подробными результатами последнего тиража
 	"""
 	print('РЕЗУЛЬТАТЫ ПОСЛЕДНЕГО ТИРАЖА')
 	print('=' * 28)
+	amount_of_draws = len(df)
 	print('- число тиражей в базе', amount_of_draws)
 	print('-', amount_of_draws, '\b-ой тираж состоялся', df['DATE'][amount_of_draws].date(), 'с результатами:', df['N1'][amount_of_draws], df['N2'][amount_of_draws], df['N3'][amount_of_draws], df['N4'][amount_of_draws], df['N5'][amount_of_draws], df['N6'][amount_of_draws])
 	if df['WIN6'][amount_of_draws] > 0:
@@ -267,21 +305,20 @@ def last_drawing_statistic(amount_of_draws: int, df: pandas.core.frame.DataFrame
 	return 0
 
 
-
-
-
-def results_of_x_last_drawing(USER_AMOUNT_DRAWING: int, df: pandas.core.frame.DataFrame, column_end: str) -> None:
+def results_of_x_last_drawing(COUNTER_USER_ANALYZE: int,
+							  df: pandas.core.frame.DataFrame,
+							  column_end: str) -> None:
 	"""
 	Получение краткой статистики по нескольким последним тиражам, количество
 	тиражей указывается пользователем в 'lotter.ini'. Параметры функции:
-	- USER_AMOUNT_DRAWING: количество тиражей;
+	- COUNTER_USER_ANALYZE: количество тиражей;
 	- df: обрабатываемый датафрейм;
 	- column_end: строка - название последнего выводимого столбца
 	"""
-	print('РЕЗУЛЬТАТЫ ПОСЛЕДНИХ', USER_AMOUNT_DRAWING, 'ТИРАЖЕЙ')
-	print('=' * (21 + len(str(USER_AMOUNT_DRAWING)) + 8))
+	print('РЕЗУЛЬТАТЫ ПОСЛЕДНИХ', COUNTER_USER_ANALYZE, 'ТИРАЖЕЙ')
+	print('=' * (21 + len(str(COUNTER_USER_ANALYZE)) + 8))
 	print('- тиражи отсортированы по убыванию:')
-	print(df.loc[:, 'DATE':column_end].tail(USER_AMOUNT_DRAWING).sort_values(by='DRAW', ascending=False), '\n')
+	print(df.loc[:, 'DATE':column_end].tail(COUNTER_USER_ANALYZE).sort_values(by='DRAW', ascending=False), '\n')
 	return 0
 
 
@@ -323,21 +360,22 @@ def add_columns_to_database(df: pandas.core.frame.DataFrame) -> None:
 	return 0
 
 
-def anomal_results_drawing(ANOMAL_DRAWING: int, df: pandas.core.frame.DataFrame) -> None:
+def anomal_results_drawing(COUNTER_ANOMALIC_DRAWS: int,
+						   df: pandas.core.frame.DataFrame) -> None:
 	"""
 	Функция анализирует датафрейм на наличие в нём необычных результатов тиражей:
-	- есть ли тиражи, в которых выпало по 4, 5 или 6 номеров из одного десятка;
-	- есть ли тиражи, состоящие только из нечётных или только чётных номеров
+	- есть ли тиражи, в которых выпало по 4, 5 или 6 номеров из одного десятка?
+	- есть ли тиражи, состоящие только из нечётных или только чётных номеров?
 	"""
-	print('САМЫЕ НЕОБЫЧНЫЕ РЕЗУЛЬТАТЫ ТИРАЖЕЙ')
-	print('=' * 35)
+	print('АНОМАЛЬНЫЕ РЕЗУЛЬТАТЫ ТИРАЖЕЙ')
+	print('=' * 29)
 	print('Есть ли в архиве тиражи, в которых выпало по 4, 5, 6 номеров одного десятка?\nЕсть ли тиражи, состоящие только из нечётных или только чётных номеров?\n')
 	# четыре номера из первого десятка
 	df_temp = df[(df['N1'] <= 9) & (df['N2'] <= 9) & (df['N3'] <= 9) & (df['N4'] <= 9)]
 	len_df_temp = len(df_temp)
 	if len_df_temp:
 		print('- тиражи, в которых выпали 4 номера из 1-го десятка, (всего', len_df_temp, 'шт):')
-		print(df_temp.tail(ANOMAL_DRAWING), '\n')
+		print(df_temp.tail(COUNTER_ANOMALIC_DRAWS), '\n')
 	# четыре номера из второго десятка
 	df_temp = df[
 		((df['N1'] >= 10) & (df['N1'] <= 19) & (df['N2'] <= 19) & (df['N3'] <= 19) & (df['N4'] <= 19)) |
@@ -347,7 +385,7 @@ def anomal_results_drawing(ANOMAL_DRAWING: int, df: pandas.core.frame.DataFrame)
 	len_df_temp = len(df_temp)
 	if len_df_temp:
 		print('- тиражи, в которых выпали 4 номера из 2-го десятка, (всего', len_df_temp, 'шт):')
-		print(df_temp.tail(ANOMAL_DRAWING), '\n')
+		print(df_temp.tail(COUNTER_ANOMALIC_DRAWS), '\n')
 	# четыре номера из третьего десятка
 	df_temp = df[
 		(df['N1'] >= 20) & (df['N1'] <= 29) & (df['N2'] <= 29) & (df['N3'] <= 29) & (df['N4'] <= 29) |
@@ -357,7 +395,7 @@ def anomal_results_drawing(ANOMAL_DRAWING: int, df: pandas.core.frame.DataFrame)
 	len_df_temp = len(df_temp)
 	if len_df_temp:
 		print('- тиражи, в которых выпали 4 номера из 3-го десятка, (всего', len_df_temp, 'шт):')
-		print(df_temp.tail(ANOMAL_DRAWING), '\n')
+		print(df_temp.tail(COUNTER_ANOMALIC_DRAWS), '\n')
 	# четыре номера из четвёртого десятка
 	df_temp = df[
 		(df['N1'] >= 30) & (df['N1'] <= 39) & (df['N2'] <= 39) & (df['N3'] <= 39) & (df['N4'] <= 39) |
@@ -367,19 +405,19 @@ def anomal_results_drawing(ANOMAL_DRAWING: int, df: pandas.core.frame.DataFrame)
 	len_df_temp = len(df_temp)
 	if len_df_temp:
 		print('- тиражи, в которых выпали 4 номера из 4-го десятка, (всего', len_df_temp, 'шт):')
-		print(df_temp.tail(ANOMAL_DRAWING), '\n')
+		print(df_temp.tail(COUNTER_ANOMALIC_DRAWS), '\n')
 	# четыре номера из пятого десятка
 	df_temp = df[(df['N3'] >= 40) & (df['N3'] <= 49) & (df['N4'] <= 49) & (df['N5'] <= 49) & (df['N6'] <= 49)]
 	len_df_temp = len(df_temp)
 	if len_df_temp:
 		print('- тиражи, в которых выпали 4 номера из 5-го десятка, (всего', len_df_temp, 'шт):')
-		print(df_temp.tail(ANOMAL_DRAWING), '\n')
+		print(df_temp.tail(COUNTER_ANOMALIC_DRAWS), '\n')
 	# пять номеров из первого десятка
 	df_temp = df[(df['N1'] <= 9) & (df['N2'] <= 9) & (df['N3'] <= 9) & (df['N4'] <= 9) & (df['N5'] <= 9)]
 	len_df_temp = len(df_temp)
 	if len_df_temp:
 		print('- тиражи, в которых выпали 5 номеров из 1-го десятка, (всего', len_df_temp, 'шт):')
-		print(df_temp.tail(ANOMAL_DRAWING), '\n')
+		print(df_temp.tail(COUNTER_ANOMALIC_DRAWS), '\n')
 	# пять номеров из второго десятка
 	df_temp = df[
 		(df['N1'] >= 10) & (df['N1'] <= 19) & (df['N2'] <= 19) & (df['N3'] <= 19) & (df['N4'] <= 19) & (df['N5'] <= 19) |
@@ -388,7 +426,7 @@ def anomal_results_drawing(ANOMAL_DRAWING: int, df: pandas.core.frame.DataFrame)
 	len_df_temp = len(df_temp)
 	if len_df_temp:
 		print('- тиражи, в которых выпали 5 номеров из 2-го десятка, (всего', len_df_temp, 'шт):')
-		print(df_temp.tail(ANOMAL_DRAWING), '\n')
+		print(df_temp.tail(COUNTER_ANOMALIC_DRAWS), '\n')
 	# пять номеров из третьего десятка
 	df_temp = df[
 		(df['N1'] >= 20) & (df['N1'] <= 29) & (df['N2'] <= 29) & (df['N3'] <= 29) & (df['N4'] <= 29) & (df['N5'] <= 29) |
@@ -397,7 +435,7 @@ def anomal_results_drawing(ANOMAL_DRAWING: int, df: pandas.core.frame.DataFrame)
 	len_df_temp = len(df_temp)
 	if len_df_temp:
 		print('- тиражи, в которых выпали 5 номеров из 3-го десятка, (всего', len_df_temp, 'шт):')
-		print(df_temp.tail(ANOMAL_DRAWING), '\n')
+		print(df_temp.tail(COUNTER_ANOMALIC_DRAWS), '\n')
 	# пять номеров из четвёртого десятка
 	df_temp = df[
 		(df['N1'] >= 30) & (df['N1'] <= 39) & (df['N2'] <= 39) & (df['N3'] <= 39) & (df['N4'] <= 39) & (df['N5'] <= 39) |
@@ -406,62 +444,63 @@ def anomal_results_drawing(ANOMAL_DRAWING: int, df: pandas.core.frame.DataFrame)
 	len_df_temp = len(df_temp)
 	if len_df_temp:
 		print('- тиражи, в которых выпали 5 номеров из 4-го десятка, (всего', len_df_temp, 'шт):')
-		print(df_temp.tail(ANOMAL_DRAWING), '\n')
+		print(df_temp.tail(COUNTER_ANOMALIC_DRAWS), '\n')
 	# пять номеров из пятого десятка
 	df_temp = df[(df['N2'] >= 40) & (df['N2'] <= 49) & (df['N3'] <= 49) & (df['N4'] <= 49) & (df['N5'] <= 49) & (df['N6'] <= 49)]
 	len_df_temp = len(df_temp)
 	if len_df_temp:
 		print('- тиражи, в которых выпали 5 номеров из 5-го десятка, (всего', len_df_temp, 'шт):')
-		print(df_temp.tail(ANOMAL_DRAWING), '\n')
+		print(df_temp.tail(COUNTER_ANOMALIC_DRAWS), '\n')
 	# шесть номеров из первого десятка
 	df_temp = df[(df['N1'] <= 9) & (df['N2'] <= 9) & (df['N3'] <= 9) & (df['N4'] <= 9) & (df['N5'] <= 9) & (df['N6'] <= 9)]
 	len_df_temp = len(df_temp)
 	if len_df_temp:
 		print('- тиражи, в которых выпали 6 номеров из 1-го десятка, (всего', len_df_temp, 'шт):')
-		print(df_temp.tail(ANOMAL_DRAWING), '\n')
+		print(df_temp.tail(COUNTER_ANOMALIC_DRAWS), '\n')
 	# шесть номеров из второго десятка
 	df_temp = df[(df['N1'] >= 10) & (df['N1'] <= 19) & (df['N2'] <= 19) & (df['N3'] <= 19) & (df['N4'] <= 19) & (df['N5'] <= 19) & (df['N6'] <= 19)]
 	len_df_temp = len(df_temp)
 	if len_df_temp:
 		print('- тиражи, в которых выпали 6 номеров из 2-го десятка, (всего', len_df_temp, 'шт):')
-		print(df_temp.tail(ANOMAL_DRAWING), '\n')
+		print(df_temp.tail(COUNTER_ANOMALIC_DRAWS), '\n')
 	# шесть номеров из третьего десятка
 	df_temp = df[(df['N1'] >= 20) & (df['N1'] <= 29) & (df['N2'] <= 29) & (df['N3'] <= 29) & (df['N4'] <= 29) & (df['N5'] <= 29) & (df['N6'] <= 29)]
 	len_df_temp = len(df_temp)
 	if len_df_temp:
 		print('- тиражи, в которых выпали 6 номеров из 3-го десятка, (всего', len_df_temp, 'шт):')
-		print(df_temp.tail(ANOMAL_DRAWING), '\n')
+		print(df_temp.tail(COUNTER_ANOMALIC_DRAWS), '\n')
 	# шесть номеров из четвёртого десятка
 	df_temp = df[(df['N1'] >= 30) & (df['N1'] <= 39) & (df['N2'] <= 39) & (df['N3'] <= 39) & (df['N4'] <= 39) & (df['N5'] <= 39) & (df['N6'] <= 39)]
 	len_df_temp = len(df_temp)
 	if len_df_temp:
 		print('- тиражи, в которых выпали 6 номеров из 4-го десятка, (всего', len_df_temp, 'шт):')
-		print(df_temp.tail(ANOMAL_DRAWING), '\n')
+		print(df_temp.tail(COUNTER_ANOMALIC_DRAWS), '\n')
 	# шесть номеров из пятого десятка
 	df_temp = df[(df['N1'] >= 40) & (df['N1'] <= 49) & (df['N2'] <= 49) & (df['N3'] <= 49) & (df['N4'] <= 49) & (df['N5'] <= 49) & (df['N6'] <= 49)]
 	len_df_temp = len(df_temp)
 	if len_df_temp:
 		print('- тиражи, в которых выпали 6 номеров из 5-го десятка, (всего', len_df_temp, 'шт):')
-		print(df_temp.tail(ANOMAL_DRAWING), '\n')
+		print(df_temp.tail(COUNTER_ANOMALIC_DRAWS), '\n')
 	# все номера нечётные
 	df_temp = df[df['ODD'] == 6]
 	len_df_temp = len(df_temp)
 	if len_df_temp:
 		print('- тиражи, в которых выпали только нечётные номера (всего', len_df_temp, 'шт):')
-		print(df[df['ODD'] == 6].tail(ANOMAL_DRAWING), '\n')
+		print(df[df['ODD'] == 6].tail(COUNTER_ANOMALIC_DRAWS), '\n')
 	# все номера чётные
 	df_temp = df[df['EVN'] == 6]
 	len_df_temp = len(df_temp)
 	if len_df_temp:
 		print('- тиражи, в которых выпали только чётные номера (всего', len_df_temp, 'шт):')
-		print(df[df['EVN'] == 6].tail(ANOMAL_DRAWING), '\n')
+		print(df[df['EVN'] == 6].tail(COUNTER_ANOMALIC_DRAWS), '\n')
 	return 0
 
 
 def dict_with_full_statistic(df: pandas.core.frame.DataFrame) -> None:
 	"""
-	Функция собирает статистику, по расчитанным дополнительно столбцам.
+	Функция собирает статистику по дополнительно расчитанным столбцам в словари.
 	Выполняется сортировка по частоте - самые частотные значения в начале.
+	(Нужна была для контроля правильности статистических графиков).
 	"""
 	print('ПОЛНАЯ СТАТИСТИКА АРХИВА ТИРАЖЕЙ В СЛОВАРЯХ')
 	print('=' * 44)
@@ -505,7 +544,7 @@ def graph_from_dict(df: pandas.core.frame.DataFrame,
 		if value < 15:
 			del d[key]
 
-	print('-', graph_title, '\n', d, '\n')
+	# print('-', graph_title, '\n', d, '\n')  # вывод статистики значений в консоль
 	fig, ax = plt.subplots()
 	plt.bar(d.keys(), d.values(), color=graph_color, label=graph_legend)  # plt.bar, plt.plot
 	plt.xlabel(graph_x)
@@ -516,7 +555,9 @@ def graph_from_dict(df: pandas.core.frame.DataFrame,
 	plt.legend(loc='best', fontsize=10)
 	fig.savefig(graph_file_name, transparent=False, dpi=600)
 	# график показывать / не показывать
-	plt.show()
+	# plt.show()
+	print('- построен график "' + graph_title + '"')
+	# logging.info('построен график "' + graph_title + '"')
 	return 0
 
 
