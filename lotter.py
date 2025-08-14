@@ -26,415 +26,6 @@ list_49_of_0 = [ 0 for i in range(49) ]  # список '49 нулей'
 list_1_to_49 = [ i for i in range(1, 50) ]  # список 'номера от 1 до 49'
 dict_49_of_0 = dict.fromkeys(list_1_to_49, 0)  # словарь '49 нулей' формируется из списка
 
-
-'''
-drawing_data = {
-    "Draw": {
-        'DrawNum': 0,
-        'DrawDate': '0000-00-00',
-        'DrawResult': [0, 0, 0, 0, 0, 0],
-        'NumsOdd': 0,
-        'NumsEven': 0,
-        'RepeatNums': 0
-    },
-    'Nums': {
-        'No1': {
-            'Num': 1,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No2': {
-            'Num': 2,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No3': {
-            'Num': 3,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No4': {
-            'Num': 4,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No5': {
-            'Num': 5,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No6': {
-            'Num': 6,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No7': {
-            'Num': 7,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No8': {
-            'Num': 8,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No9': {
-            'Num': 9,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No10': {
-            'Num': 10,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No11': {
-            'Num': 11,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No12': {
-            'Num': 12,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No13': {
-            'Num': 13,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No14': {
-            'Num': 14,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No15': {
-            'Num': 15,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No16': {
-            'Num': 16,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No17': {
-            'Num': 17,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No18': {
-            'Num': 18,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No19': {
-            'Num': 19,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No20': {
-            'Num': 20,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No21': {
-            'Num': 21,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No22': {
-            'Num': 22,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No23': {
-            'Num': 23,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No24': {
-            'Num': 24,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No25': {
-            'Num': 25,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No26': {
-            'Num': 26,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No27': {
-            'Num': 27,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No28': {
-            'Num': 28,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No29': {
-            'Num': 29,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No30': {
-            'Num': 30,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No31': {
-            'Num': 31,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No32': {
-            'Num': 32,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No33': {
-            'Num': 33,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No34': {
-            'Num': 34,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No35': {
-            'Num': 35,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No36': {
-            'Num': 36,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No37': {
-            'Num': 37,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No38': {
-            'Num': 38,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No39': {
-            'Num': 39,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No40': {
-            'Num': 40,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No41': {
-            'Num': 41,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No42': {
-            'Num': 42,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No43': {
-            'Num': 43,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No44': {
-            'Num': 44,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No45': {
-            'Num': 45,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No46': {
-            'Num': 46,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No47': {
-            'Num': 47,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No48': {
-            'Num': 48,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            },
-        'No49': {
-            'Num': 49,
-            'Frequency': 0,
-            'LastDraw': 0,
-            'LastDate': '0000-00-00',
-            'DayAgo': 0,
-            'Repeat': 0
-            }
-        },
-    'Hot/Cold': {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0, '6': 0, '7': 0, '8': 0, '9': 0, '10': 0, '11': 0, '12': 0, '13': 0, '14': 0, '15': 0, '16': 0, '17': 0, '18': 0, '19': 0, '20': 0, '21': 0, '22': 0, '23': 0, '24': 0, '25': 0, '26': 0, '27': 0, '28': 0, '29': 0, '30': 0, '31': 0, '32': 0, '33': 0, '34': 0, '35': 0, '36': 0, '37': 0, '38': 0, '39': 0, '40': 0, '41': 0, '42': 0, '43': 0, '44': 0, '45': 0, '46': 0, '47': 0, '48': 0, '49': 0}
-    }
-'''
-
 # Чтение параметров из lotter.ini
 config = configparser.ConfigParser()  # создание объекта парсера
 config.read("lotter.ini")
@@ -473,6 +64,7 @@ print('\nLOTTER', '*' * 25, MIN, 'из', MAX,  '*' * 25, now_date, '\n')
 
 if LEGEND == 1:
     print("""Используемые сокращения:
+    \tAGO - сколько дней назад выпадал данный конкретный номер;
     \tBYN3 - вознаграждение за 3 угаданных номера, BYN;
     \tBYN4 - вознаграждение за 4 угаданных номера, BYN;
     \tBYN5 - вознаграждение за 5 угаданных номеров, BYN;
@@ -483,16 +75,33 @@ if LEGEND == 1:
     \tDRAW - номер тиража;
     \tEVN - количество чётных номеров в тираже;
     \tFOND - призовой фонд, BYN;
-    \tFR1...FR6 - частота выпадения номера;
+    \tFREQ - частота выпадения данного конкретного номера;
+    \tFR1...FR6 - частота выпадения номера 1...6;
     \tJACK - джек-пот, BYN;
+    \tLSTDAT - дата выпадения данного конкретного номера;
+    \tLSTDRW - номер тиража, в котором выпадал данный конкретный номер;
     \tN1...N6 - выигрышные номера;
+    \tNUM - дата выпадения данного конкретного номера;
     \tODD - количество нечётных номеров в тираже;
     \tRPT - количество повторившихся номеров из предыдущего тиража;
     \tSUM - сумма всех номеров в тираже;
     \tWIN3 - количество игроков, угадавших 3 номера;
     \tWIN4 - количество игроков, угадавших 4 номера;
     \tWIN5 - количество игроков, угадавших 5 номеров;
-    \tWIN6 - количество игроков, угадавших 6 номеров.""", '\n')  # , file = f
+    \tWIN6 - количество игроков, угадавших 6 номеров.
+    \tВ секции JSON с названием 'DRW':
+    \t\tDRW - подразумевается 'тираж';
+    \t\tNUM - номер отдельного конкретного тиража;
+    \t\tDAT - дата проведения отдельного конкретного тиража;
+    \t\tRES - результаты отдельного конкретного тиража;
+    \t\tODD - количество нечётных номеров в отдельном конкретном тираже;
+    \t\tEVN - количество чётных номеров в отдельном конкретном тираже;
+    \t\tRPT - количество повторившихся номеров (с прошлого тиража);
+    \tВ секции JSON с названием 'NUMS':
+    \t\t - ;
+    \t\t - ;
+    \t\t - ;
+    \t\t - .""", '\n')  # , file = f
 
 # Настройки для вывода Pandas в консоль:
 pd.set_option('display.max_rows', None)
@@ -545,22 +154,22 @@ amount_of_draws = len(df)
 
 # Формирование словаря для накапливания статистики Hot/Cold и, возможно, перевода в JSON
 drawing_data = dict()
-# секция "Draw"
+# секция "DRW"
 list_draw_result = [ 0 for i in range(MIN) ]  # сделать range(MIN)
-drawing_data["Draw"] = {'DrawNum': 0, 'DrawDate': '0000-00-00', 'DrawResult': list_draw_result,
-                        'NumsOdd': 0, 'NumsEven': 0, 'RepeatNums': 0}
-# секция "Nums"
+drawing_data["DRW"] = {'NUM': 0, 'DAT': '0000-00-00', 'RST': list_draw_result,
+                        'ODD': 0, 'EVN': 0, 'RPT': 0}
+# секция "NUMS"
 temp_dict = dict()
-for i in range(MAX+1):  # сделать range(1, MAX+1, 1)
-    temp_dict['No' + str(i)] = {'Num': i, 'Frequency': 0, 'LastDraw': 0,
-                                'LastDate': '0000-00-00', 'DayAgo': 0, 'Repeat': 0}
-drawing_data["Nums"] = temp_dict
+for i in range(1, MAX+1):  # сделать range(1, MAX+1, 1)
+    temp_dict['No' + str(i)] = {'NUM': i, 'FREQ': 0, 'LSTDRW': 0,
+                                'LSTDAT': '0000-00-00', 'AGO': 0, 'RPT': 0}
+drawing_data["NUMS"] = temp_dict
 del(temp_dict)
-# секция "Hot/Cold"
+# секция "HOT"
 temp_dict = dict()
 for i in range(1, MAX+1):
     temp_dict[str(i)] = 0
-drawing_data["Hot/Cold"] = temp_dict
+drawing_data["HOT"] = temp_dict
 del(temp_dict)
 
 with open('lotter_results.csv', 'r', encoding='utf-8') as donor:
@@ -570,9 +179,9 @@ with open('lotter_results.csv', 'r', encoding='utf-8') as donor:
             if data[0] == 'DRAW':
                 # recepient.write(line)  # названия столбцов не записывать
                 continue
-            drawing_data["Draw"]['DrawNum'] = data[0]
-            drawing_data["Draw"]['DrawDate'] = data[1]
-            drawing_data["Draw"]['DrawResult'] = [int(data[2]), int(data[3]), int(data[4]), int(data[5]), int(data[6]), int(data[7])]
+            drawing_data["DRW"]['NUM'] = data[0]
+            drawing_data["DRW"]['DAT'] = data[1]
+            drawing_data["DRW"]['RST'] = [int(data[2]), int(data[3]), int(data[4]), int(data[5]), int(data[6]), int(data[7])]
 
             # подсчёт количества нечётных и чётных номеров
             amount_odd = 0
@@ -582,21 +191,21 @@ with open('lotter_results.csv', 'r', encoding='utf-8') as donor:
                     amount_odd += 1
                 else:
                     amount_even += 1
-            drawing_data["Draw"]['NumsOdd'] = amount_odd
-            drawing_data["Draw"]['NumsEven'] = amount_even
+            drawing_data["DRW"]['ODD'] = amount_odd
+            drawing_data["DRW"]['EVN'] = amount_even
 
             for i in range(2, 8):
                 NoName = "No" + data[i]
-                drawing_data['Nums'][NoName]['Frequency'] += 1
-                drawing_data['Hot/Cold'][str(NoName)[2:]] += 1
-                drawing_data['Nums'][NoName]['LastDraw'] = data[0]
-                drawing_data['Nums'][NoName]['LastDate'] = data[1]
+                drawing_data['NUMS'][NoName]['FREQ'] += 1
+                drawing_data['HOT'][str(NoName)[2:]] += 1
+                drawing_data['NUMS'][NoName]['LSTDRW'] = data[0]
+                drawing_data['NUMS'][NoName]['LSTDAT'] = data[1]
                 delta_days = (parse(now_date) - parse(data[1])).days
-                drawing_data['Nums'][NoName]['DayAgo'] = delta_days
+                drawing_data['NUMS'][NoName]['AGO'] = delta_days
                 # sum_1_6 = summ(int(data[2]), int(data[3]), int(data[4]), int(data[5]), int(data[6]), int(data[7]))
                 # сортировка nums, собранных в dict, в порядке hot -> cold (по уменьшению частотности):
-                dict_hot_cold = dict(drawing_data['Hot/Cold'])
-                drawing_data['Hot/Cold'] = dict(sorted(dict_hot_cold.items(), key=lambda x: x[1], reverse=True))
+                dict_hot_cold = dict(drawing_data['HOT'])
+                drawing_data['HOT'] = dict(sorted(dict_hot_cold.items(), key=lambda x: x[1], reverse=True))
 
             # print(drawing_data)
             json_data = json.dumps(drawing_data)
@@ -608,7 +217,7 @@ with open('lotter_results.csv', 'r', encoding='utf-8') as donor:
             recepient.write(json_data + '\n')  # в файл записывается JSON с текущими значениями hot/cold
             # recepient.write(line)   # в файл ранее записывалась исходная строка
 
-        dict_hot_cold = dict(drawing_data['Hot/Cold'])
+        dict_hot_cold = dict(drawing_data['HOT'])
         # output json_data with result to console
         # json_data = json.dumps(drawing_data, indent=2)
         # print('\n', json_data)     # str
@@ -623,19 +232,19 @@ list_hot_cold = [ int(i) for i in list_hot_cold ]  # в list_hot_cold уже int
 print('Ряд номеров от самых "горячих" к самым "холодным":')
 print(*dict_hot_cold, '\n')
 print('''Подробные сведения сведены в таблицу, где: Num - номер,
-Freq - количество выпадений номера за выбранный период,
-Last - дата, когда последний раз выпадал данный номер,
-Draw - номер тиража, когда номер выпадал в последний раз,
-Ago - сколько дней назад последний раз выпадал номер\n''')
-print('Num', '\t', 'Freq', '\t', 'Last', '\t\t', "Draw", '\t', 'Ago')
+FR - количество выпадений номера за выбранный период,
+LST - дата, когда последний раз выпадал данный номер,
+DRW - номер тиража, когда номер выпадал в последний раз,
+AGO - сколько дней назад последний раз выпадал номер\n''')
+print('NUM', '\t', 'FR', '\t', 'LST', '\t\t', "DRW", '\t', 'AGO')
 for i in range(0, 49):
     # print(list_hot_cold[i], sep=' ', end=' ')
     print(
         list_hot_cold[i], '\t',
-        drawing_data['Nums']['No' + str(list_hot_cold[i])]['Frequency'], '\t',
-        drawing_data['Nums']['No' + str(list_hot_cold[i])]['LastDate'], '\t',
-        drawing_data['Nums']['No' + str(list_hot_cold[i])]['LastDraw'], '\t',
-        drawing_data['Nums']['No' + str(list_hot_cold[i])]['DayAgo'], '\t',
+        drawing_data['NUMS']['No' + str(list_hot_cold[i])]['FREQ'], '\t',
+        drawing_data['NUMS']['No' + str(list_hot_cold[i])]['LSTDAT'], '\t',
+        drawing_data['NUMS']['No' + str(list_hot_cold[i])]['LSTDRW'], '\t',
+        drawing_data['NUMS']['No' + str(list_hot_cold[i])]['AGO'], '\t',
         sep=' ', end='\n')
 # print('Hot -> Cold sorted:\n', dict(sorted(dict_hot_cold.items(), key=lambda x: x[1], reverse=True)))
 print()
